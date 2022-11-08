@@ -26,6 +26,7 @@ do
   declare -a parts=($(echo -e $i | tr "$delimiter" " "))
   repo=${parts[0]}
   branch=${parts[1]}
+done
 
 git clone "git@github.com:Smarsh/${repo}.git"
 git checkout "${branch}" && git pull origin "${branch}" && git checkout -b pop-release-candidate
