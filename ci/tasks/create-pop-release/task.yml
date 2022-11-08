@@ -1,0 +1,10 @@
+---
+platform: linux
+
+inputs:
+  - name: delivery-pop-automation
+
+run:
+  path: delivery-pop-automation/ci/tasks/create-pop-release-candidate/task.sh
+
+#params:
