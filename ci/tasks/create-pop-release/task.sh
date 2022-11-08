@@ -32,12 +32,3 @@ do
     #There is an exception for the ea-versions repo where the force push will be aws-us-west-2-poplite-production-> pop-stable
   fi
 done
-
-
-
-
-
-#Inject a new step CREATE_POP_RELEASE programmatically that runs only for poplite
-#Priority 800 - should run after RUN_E2E_SANITY_PIPELINE
-#The pop entrypoint for this step should do a force push on all the repos pop-release-candidate → pop-stable
-#There is an exception for the ea-versions repo where the force push will be aws-us-west-2-poplite-production-> pop-stable
