@@ -20,6 +20,9 @@ REPOS=(
 'dataservices-deployment-bootstrap,master'
 )
 
+git --config user.name "CI Bot"
+git --config user.email "ci.bot@smarsh.com"
+
 for i in "${REPOS[@]}"
 do
   delimiter=","
