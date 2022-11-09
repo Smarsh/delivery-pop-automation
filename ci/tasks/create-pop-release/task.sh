@@ -27,8 +27,10 @@ do
   repo=${parts[0]}
   branch=${parts[1]}
   if [repo !== delivery-ea-versions-api] ; then
-    git checkout "${branch}" && git push "${branch}" -f
+    git checkout "${branch}" && git push --set-upstream origin "${branch}" -f
   else
     #There is an exception for the ea-versions repo where the force push will be aws-us-west-2-poplite-production-> pop-stable
   fi
+  git push origin --delete "${branch}"
 done
+
