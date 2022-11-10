@@ -7,3 +7,5 @@ inputs:
 run:
   path: delivery-pop-automation/ci/tasks/create-pop-release/task.sh
 
+params:
+  GIT_PRIVATE_KEY_RSA_BASE64:
