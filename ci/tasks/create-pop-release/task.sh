@@ -6,21 +6,21 @@ ls -la delivery-pop-automation
 source delivery-pop-automation/.env
 
 REPOS=(
-#'concourse-mgmt',
-#'ea-uaa-deployment',
-#'extraction-microservice',
-#'identity-microservice',
-#'delivery-ea-tenants-pipelines',
-#'ea-key-generation',
-#'paas-cf-mgmt-aws',
-#'paas-cf-mgmt-aws-nam-mt',
-#'elasticsearch-boshrelease-deployments',
-#'kafka-boshrelease-2.4.x-deployments',
-#'mongodb-boshrelease-3.6.x-deployments',
-#'ea-egw-pipelines',
-#'ea-e2e-smoke',
-#'ea-zookeeper',
-#'dataservices-deployment-bootstrap'
+'concourse-mgmt',
+'ea-uaa-deployment',
+'extraction-microservice',
+'identity-microservice',
+'delivery-ea-tenants-pipelines',
+'ea-key-generation',
+'paas-cf-mgmt-aws',
+'paas-cf-mgmt-aws-nam-mt',
+'elasticsearch-boshrelease-deployments',
+'kafka-boshrelease-2.4.x-deployments',
+'mongodb-boshrelease-3.6.x-deployments',
+'ea-egw-pipelines',
+'ea-e2e-smoke',
+'ea-zookeeper',
+'dataservices-deployment-bootstrap'
 )
 
 # Set colours
@@ -68,7 +68,7 @@ done
  cd delivery-ea-versions
  if [ `git branch | grep pop-release` ]
  then
-    git push origin --delete pop-release || true
+    git push origin --delete pop-release
     git checkout aws-us-west-2-poplite-production
     git push origin pop-release
  else
