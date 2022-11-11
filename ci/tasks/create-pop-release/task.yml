@@ -1,6 +1,11 @@
 ---
 platform: linux
 
+image_resource:
+  type: registry-image
+  source:
+    repository: smarshops/delivery-ci-fly
+
 inputs:
   - name: delivery-pop-automation
 
@@ -8,4 +13,4 @@ run:
   path: delivery-pop-automation/ci/tasks/create-pop-release/task.sh
 
 params:
-  GIT_PRIVATE_KEY_RSA_BASE64:
+  GIT_PRIVATE_KEY:

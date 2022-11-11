@@ -2,25 +2,28 @@
 
 set -euo pipefail
 
-REPOS=(
-'concourse-mgmt,master',
-'ea-uaa-deployment,master',
-'extraction-microservice,master',
-'identity-microservice,master',
-'delivery-ea-tenants-pipelines,master',
-'ea-key-generation,master',
-'paas-cf-mgmt-aws,main',
-'paas-cf-mgmt-aws-nam-mt,main',
-'elasticsearch-boshrelease-deployments,master',
-'kafka-boshrelease-2.4.x-deployments,master',
-'mongodb-boshrelease-3.6.x-deployments,master',
-'ea-egw-pipelines,master',
-'ea-e2e-smoke,master',
-'ea-zookeeper,master',
-'dataservices-deployment-bootstrap,master'
-)
+ls -la delivery-pop-automation
+source delivery-pop-automation/.env
 
-source .env
+
+REPOS=(
+'pop-test-repo, master'
+#'concourse-mgmt,master',
+#'ea-uaa-deployment,master',
+#'extraction-microservice,master',
+#'identity-microservice,master',
+#'delivery-ea-tenants-pipelines,master',
+#'ea-key-generation,master',
+#'paas-cf-mgmt-aws,main',
+#'paas-cf-mgmt-aws-nam-mt,main',
+#'elasticsearch-boshrelease-deployments,master',
+#'kafka-boshrelease-2.4.x-deployments,master',
+#'mongodb-boshrelease-3.6.x-deployments,master',
+#'ea-egw-pipelines,master',
+#'ea-e2e-smoke,master',
+#'ea-zookeeper,master',
+#'dataservices-deployment-bootstrap,master'
+)
 
 # Set colours
 GREEN="\e[32m"
@@ -34,18 +37,14 @@ function setup_git(){
 	ssh-keyscan github.com >> ~/.ssh/known_hosts 2>/dev/null;
 
 	cat <<-EOF > ~/.ssh/id_rsa
-	$GIT_PRIVATE_KEY_RSA_BASE64
+	$GIT_PRIVATE_KEY
 	EOF
 
 	chmod 600 ~/.ssh/id_rsa
 
 	git config --global user.name "Concourse CI Bot"
 	git config --global user.email "ci@localhost"
-}
 
-function clone_repo(repo){
-	echo -e $GREEN"Cloning Repo $repo"$WHITE
-	git clone git@github.com:Smarsh/${repo}.git
 }
 
 setup_git
@@ -58,10 +57,10 @@ do
   declare -a parts=($(echo -e $i | tr "$delimiter" " "))
   repo=${parts[0]}
   branch=${parts[1]}
-  clone_repo(${repo})
-  cd $repo
+  git clone git@github.com:Smarsh/${repo}.git
+  cd ${repo}
   git checkout "${branch}" && git pull origin "${branch}" && git checkout -b pop-release-candidate
-  git push --set-upstream origin "${branch}" -f
+  git push --set-upstream origin pop-release-candidate
   cd ..
 done
 
