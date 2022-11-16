@@ -1,17 +1,16 @@
 ---
 platform: linux
-
 image_resource:
   type: registry-image
   source:
     repository: smarshops/delivery-ci-fly
+    username: ((docker-hub-username))
+    password: ((docker-hub-password))
 
 inputs:
-  - name: delivery-pop-automation
+- name: repo
+- name: pop-input
 
 run:
   path: bash
-  args: [delivery-pop-automation/ci/tasks/create-pop-release-candidate/task.sh]
-
-params:
-  GIT_PRIVATE_KEY:
+  args: ["repo/ci/tasks/create-pop-release-candidate/task.sh"]

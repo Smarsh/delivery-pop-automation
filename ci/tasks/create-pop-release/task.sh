@@ -2,8 +2,7 @@
 
 set -euo pipefail
 
-ls -la delivery-pop-automation
-source delivery-pop-automation/.env
+source pop-input/.env
 
 REPOS=(
 'concourse-mgmt',
@@ -57,7 +56,7 @@ for repo in "${REPOS[@]}"
 do
   clone_repo ${repo}
   cd $repo
-  git checkout pop-release-candidate && git pull origin pop-release-candidate && git checkout -b pop-release
+  git checkout pop-release-candidate && git checkout -b pop-release
   git push --set-upstream origin pop-release -f
   git branch -d pop-release-candidate
   git push origin --delete pop-release-candidate
@@ -66,8 +65,8 @@ done
 
  clone_repo "delivery-ea-versions"
  cd delivery-ea-versions
- if [ `git branch | grep pop-release` ]
- then
+ if git ls-remote --heads git@github.com:Smarsh/delivery-ea-versions.git pop-release | grep pop-release
+ then   
     git push origin --delete pop-release
     git checkout aws-us-west-2-poplite-production
     git push origin pop-release
