@@ -1,0 +1,12 @@
+---
+platform: linux
+
+inputs:
+  - name: delivery-tenants-api
+
+run:
+  path: delivery-tenants-api/ci/tasks/poplite-nuke-pipelines/task.sh
+
+params:
+  CONCOURSE_USERNAME:
+  CONCOURSE_PASSWORD:
