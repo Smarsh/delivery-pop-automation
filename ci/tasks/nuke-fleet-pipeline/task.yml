@@ -2,7 +2,7 @@
 platform: linux
 
 inputs:
-  - name: delivery-tenants-api
+  - name: delivery-pop-automation
 
 run:
   path: delivery-tenants-api/ci/tasks/nuke-fleet-pipeline/task.sh
