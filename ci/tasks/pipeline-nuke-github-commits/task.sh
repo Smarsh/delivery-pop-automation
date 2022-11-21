@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-source delivery-tenants-api/ci/tasks/poplite-nuke-github-commits/trycatch.sh
+source delivery-pop-automation/ci/tasks/pipeline-nuke-github-commits/trycatch.sh
 
 # Set colours
 GREEN="\e[32m"
@@ -36,9 +36,9 @@ echo -e ${GREEN}"___"${WHITE}
 echo -e ${GREEN}"Find tenant"${WHITE}
 echo -e ${GREEN}"___"${WHITE}
 
-http_code=$(curl -LI --location --request GET "${API_URL}/tenants?page=0&size=1&customer-name=poplite" -o /dev/null --header 'Content-Type: application/json' --header 'Accept: application/json' --header "Authorization: Bearer $AUTH_TOKEN" -w '%{http_code}\n' -s)
+http_code=$(curl -LI --location --request GET "${API_URL}/tenants?page=0&size=1&customer-name=${CUSTOMER}" -o /dev/null --header 'Content-Type: application/json' --header 'Accept: application/json' --header "Authorization: Bearer $AUTH_TOKEN" -w '%{http_code}\n' -s)
 if [ ${http_code} -eq 200 ]; then
-    TENANT_ID=$(curl --location --request GET "${API_URL}/tenants?page=0&size=1&customer-name=poplite" \
+    TENANT_ID=$(curl --location --request GET "${API_URL}/tenants?page=0&size=1&customer-name=${CUSTOMER}" \
       --header 'Content-Type: application/json' \
       --header 'Accept: application/json' \
       --header "Authorization: Bearer $AUTH_TOKEN" | jq '.[0].id')
@@ -81,8 +81,8 @@ try
   git clone "git@github.com:Smarsh/delivery-ea-versions.git"
   pushd delivery-ea-versions
 
-  delete=$(git push -d origin aws-us-west-2-poplite-production >>/dev/null 2>&1;echo $?)
-  delete=$(git branch -d aws-us-west-2-poplite-production >>/dev/null 2>&1;echo $?)
+  delete=$(git push -d origin aws-us-west-2-${CUSTOMER}-production >>/dev/null 2>&1;echo $?)
+  delete=$(git branch -d aws-us-west-2-${CUSTOMER}-production >>/dev/null 2>&1;echo $?)
 
   popd
   rm -rf delivery-ea-versions

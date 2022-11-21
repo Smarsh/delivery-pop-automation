@@ -5,7 +5,7 @@ inputs:
   - name: delivery-tenants-api
 
 run:
-  path: delivery-tenants-api/ci/tasks/poplite-nuke-github-commits/task.sh
+  path: delivery-tenants-api/ci/tasks/pipeline-nuke-github-commits/task.sh
 
 params:
   OKTA_OAUTH2_CLIENT_ID:
