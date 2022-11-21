@@ -1,0 +1,163 @@
+---
+meta:
+  slack-alerts: &slack-alerts
+    on_error:
+      put: slack-alert
+      params:
+        channel: bot-test
+        silent: true
+        text: |
+          *ERROR:* `$BUILD_PIPELINE_NAME` has encountered an error \
+          in job `$BUILD_JOB_NAME`.
+          You can view the output here: $ATC_EXTERNAL_URL/builds/$BUILD_ID
+        icon_emoji: ":warning:"
+    on_failure:
+      put: slack-alert
+      params:
+        channel: bot-test
+        silent: true
+        text: |
+          *FAILURE:* `$BUILD_PIPELINE_NAME` has encountered a failure \
+          in job `$BUILD_JOB_NAME`.
+          You can view the output here: $ATC_EXTERNAL_URL/builds/$BUILD_ID
+        icon_emoji: ":exclamation:"
+
+anchors:
+
+  <<: &bosh_creds
+    BOSH_CA_CERT: |
+      ((bosh_sidecar_ca_cert))
+    BOSH_CLIENT: ((bosh_sidecar_client))
+    BOSH_CLIENT_SECRET: ((bosh_sidecar_client_secret))
+    BOSH_ENVIRONMENT: ((bosh_sidecar_environment))
+
+  <<: &credhub_params
+    CREDHUB_CLIENT: ((credhub_client))
+    CREDHUB_SECRET: ((credhub_secret))
+    CREDHUB_SERVER: ((credhub_server))
+
+groups:
+
+  - name: all
+    jobs:
+      - set-pipeline
+      - nuke-ea-lite
+
+jobs:
+
+  - name: set-pipeline
+    serial: true
+    plan:
+      - in_parallel:
+        - get: delivery-tenants-api
+          trigger: true
+      - set_pipeline: nuke-ea-lite
+        file: delivery-tenants-api/ci/nuke-ea-lite-pipeline.yml
+        var_files:
+          - delivery-tenants-api/ci/vars/platform-delivery-staging-aws-us-west-2.yml
+
+  - name: nuke-ea-lite
+    serial: true
+    plan:
+      - in_parallel:
+        - get: delivery-tenants-api
+          passed: [ set-pipeline ]
+        - get: delivery-ci-all-image
+      - in_parallel:
+        - task: nuke-pipelines
+          attempts: 1
+          file: delivery-tenants-api/ci/tasks/poplite-nuke-pipelines/task.yml
+          image: delivery-ci-all-image
+          params:
+            CONCOURSE_USERNAME: admin
+            CONCOURSE_PASSWORD: ((app_concourse_admin_password))
+        - task: nuke-apps
+          attempts: 1
+          file: delivery-tenants-api/ci/tasks/poplite-nuke-apps/task.yml
+          image: delivery-ci-all-image
+          params:
+            CF_USERNAME: ((cf_username))
+            CF_PASSWORD: ((cf_password))
+        - task: nuke-spaces
+          attempts: 1
+          file: delivery-tenants-api/ci/tasks/poplite-nuke-spaces/task.yml
+          image: delivery-ci-all-image
+          params:
+            CF_USERNAME: ((cf_username))
+            CF_PASSWORD: ((cf_password))
+        - task: nuke-bosh-deployments
+          attempts: 1
+          file: delivery-tenants-api/ci/tasks/poplite-nuke-bosh-deployments/task.yml
+          image: delivery-ci-all-image
+          params:
+            <<: *bosh_creds
+        - task: nuke-credhub-secrets
+          attempts: 1
+          file: delivery-tenants-api/ci/tasks/poplite-nuke-credhub-secrets/task.yml
+          image: delivery-ci-all-image
+          params:
+            <<: *credhub_params
+        - task: nuke-github-commits
+          attempts: 1
+          file: delivery-tenants-api/ci/tasks/poplite-nuke-github-commits/task.yml
+          image: delivery-ci-all-image
+          params:
+            OKTA_OAUTH2_CLIENT_ID: ((okta_oauth2_client_id_tenants_api))
+            OKTA_OAUTH2_CLIENT_SECRET: ((okta_oauth2_client_secret_tenants_api))
+            GIT_PRIVATE_KEY: ((git-private-key))
+        - task: nuke-slack-channel
+          attempts: 1
+          file: delivery-tenants-api/ci/tasks/poplite-nuke-slack-channel/task.yml
+          image: delivery-ci-all-image
+          params:
+            SLACK_EA_TENANTS_ADMIN_TOKEN: ((slack_ea_tenants_admin_token))
+      - task: nuke-trigger-file
+        attempts: 1
+        file: delivery-tenants-api/ci/tasks/poplite-nuke-trigger-file/task.yml
+        image: delivery-ci-all-image
+        params:
+          GIT_PRIVATE_KEY: ((git-private-key))
+      - task: nuke-tenant
+        attempts: 1
+        file: delivery-tenants-api/ci/tasks/poplite-nuke-tenant/task.yml
+        image: delivery-ci-all-image
+        params:
+          OKTA_OAUTH2_CLIENT_ID: ((okta_oauth2_client_id_tenants_api))
+          OKTA_OAUTH2_CLIENT_SECRET: ((okta_oauth2_client_secret_tenants_api))
+      - task: nuke-fleet-pipeline
+        attempts: 1
+        file: delivery-tenants-api/ci/tasks/poplite-nuke-fleet-pipeline/task.yml
+        image: delivery-ci-all-image
+        params:
+          CONCOURSE_USERNAME: admin
+          CONCOURSE_PASSWORD: ((app_concourse_admin_password))
+
+    <<: *slack-alerts
+
+resources:
+
+  - name: delivery-tenants-api
+    type: git
+    source:
+      private_key: ((github_private_key))
+      uri: git@github.com:Smarsh/delivery-tenants-api.git
+      branch: master
+      ignore_paths: [version, delivery-ea-tenants-resource]
+
+  - name: slack-alert
+    type: slack-notification
+    source:
+      url: ((slack-webhook-url))
+
+  - name: delivery-ci-all-image
+    type: registry-image
+    source:
+      repository: smarshops/delivery-ci-all
+
+resource_types:
+  
+  - name: slack-notification
+    type: registry-image
+    source:
+      repository: cfcommunity/slack-notification-resource
+      tag: latest

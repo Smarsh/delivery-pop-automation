@@ -1,0 +1,19 @@
+---
+number_of_instances: 1
+disk_quota: 3G
+memory: 2G
+dd_tag: env:smarsh-nam-platform_core-sandbox,segment:enterprise,product:enterprise-archive
+dd_service: delivery-tenants-api
+dd_env: aws-us-west-2-smarsh-staging
+space: platform-delivery-services
+org: platform
+api: https://api.sys.us-west-2.aws.smarsh.cloud
+pipeline_name: delivery-tenants-api
+us_east_1_concourse_password: not-applicable
+region: us-west-2
+cf_api: https://api.sys.us-west-2.aws.smarsh.cloud
+vars_file: platform-delivery-staging-aws-us-west-2.yml
+argocd_project: product-services
+namespace: product-services
+customer: poplite
+tier: uat
