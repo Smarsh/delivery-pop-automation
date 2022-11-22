@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-source delivery-pop-automation/ci/tasks/pipeline-nuke-github-commits/trycatch.sh
+source delivery-tenants-api/ci/tasks/poplite-nuke-github-commits/trycatch.sh
 
 # Set colours
 GREEN="\e[32m"
@@ -36,9 +36,9 @@ echo -e ${GREEN}"___"${WHITE}
 echo -e ${GREEN}"Find tenant"${WHITE}
 echo -e ${GREEN}"___"${WHITE}
 
-http_code=$(curl -LI --location --request GET "${API_URL}/tenants?page=0&size=1&customer-name=${CUSTOMER}" -o /dev/null --header 'Content-Type: application/json' --header 'Accept: application/json' --header "Authorization: Bearer $AUTH_TOKEN" -w '%{http_code}\n' -s)
+http_code=$(curl -LI --location --request GET "${API_URL}/tenants?page=0&size=1&customer-name=poplite" -o /dev/null --header 'Content-Type: application/json' --header 'Accept: application/json' --header "Authorization: Bearer $AUTH_TOKEN" -w '%{http_code}\n' -s)
 if [ ${http_code} -eq 200 ]; then
-    TENANT_ID=$(curl --location --request GET "${API_URL}/tenants?page=0&size=1&customer-name=${CUSTOMER}" \
+    TENANT_ID=$(curl --location --request GET "${API_URL}/tenants?page=0&size=1&customer-name=poplite" \
       --header 'Content-Type: application/json' \
       --header 'Accept: application/json' \
       --header "Authorization: Bearer $AUTH_TOKEN" | jq '.[0].id')
@@ -81,11 +81,10 @@ try
   git clone "git@github.com:Smarsh/delivery-ea-versions.git"
   pushd delivery-ea-versions
 
-  delete=$(git push -d origin aws-us-west-2-${CUSTOMER}-production >>/dev/null 2>&1;echo $?)
-  delete=$(git branch -d aws-us-west-2-${CUSTOMER}-production >>/dev/null 2>&1;echo $?)
+  delete=$(git push -d origin aws-us-west-2-poplite-production >>/dev/null 2>&1;echo $?)
+  delete=$(git branch -d aws-us-west-2-poplite-production >>/dev/null 2>&1;echo $?)
 
   popd
-  rm -rf delivery-ea-versions
   echo -e ${GREEN}"Finished reverting delivery-ea-versions"${WHITE}
 )
 catch || {
@@ -136,7 +135,6 @@ try
   fi
 
   popd
-  rm -rf delivery-aws-pipelines
   echo -e ${GREEN}"Finished reverting delivery-aws-pipelines"${WHITE}
 )
 catch || {
@@ -189,7 +187,6 @@ try
   fi
 
   popd
-  rm -rf paas-cf-mgmt-aws-non-prod
   echo -e ${GREEN}"Finished reverting paas-cf-mgmt-aws-non-prod"${WHITE}
 )
 catch || {
@@ -233,7 +230,6 @@ try
   fi
 
   popd
-  rm -rf ea-platform-sre-team
   echo -e ${GREEN}"Finished reverting ea-platform-sre-team"${WHITE}
 )
 catch || {
@@ -305,8 +301,6 @@ do
 
   popd
 
-  rm -rf "$repo"
-
   echo -e ${GREEN}"Finished reverting ${repo}"${WHITE}
 
 done
@@ -329,3 +323,41 @@ then
 else
   echo -e ${GREEN}"No errors."${WHITE}
 fi
+
+# Deleting poplite-related files and folders
+
+for i in "${REPOS[@]}"
+do
+  delimiter=","
+  declare -a parts=($(echo -e $i | tr "$delimiter" " "))
+  repo=${parts[0]}
+  branch=${parts[1]}
+
+  cd ${repo}
+  git checkout "${branch}"
+
+  DIRS=( $(find . -type d -name "*poplite*" ) )
+  FILES=( $(find . -type f -name "*poplite*" ) )
+
+for i in "${DIRS[@]}"
+do
+  if [ -d "${i}" ]
+  then
+    echo "This is a directory: ${i}..."
+    rm -r "$i"
+  else
+    echo "This is not a directory: ${i}..."
+  fi
+done
+
+for i in "${FILES[@]}"
+do
+  if [ -f "${i}" ]
+  then
+    echo "This is a file: ${i}"
+    rm "$i"
+  else
+    echo "This file does not exist: ${i}..."
+  fi
+done
+done
