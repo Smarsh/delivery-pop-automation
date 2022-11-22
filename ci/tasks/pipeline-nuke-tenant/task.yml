@@ -5,8 +5,9 @@ inputs:
   - name: delivery-tenants-api
 
 run:
-  path: delivery-tenants-api/ci/tasks/poplite-nuke-tenant/task.sh
+  path: delivery-tenants-api/ci/tasks/pipeline-nuke-tenant/task.sh
 
 params:
   OKTA_OAUTH2_CLIENT_ID:
   OKTA_OAUTH2_CLIENT_SECRET:
+  CUSTOMER:

@@ -5,8 +5,10 @@ inputs:
   - name: delivery-tenants-api
 
 run:
-  path: delivery-tenants-api/ci/tasks/poplite-nuke-spaces/task.sh
+  path: delivery-tenants-api/ci/tasks/pipeline-nuke-spaces/task.sh
 
 params:
   CF_USERNAME:
   CF_PASSWORD:
+  CUSTOMER:
+  REGION:

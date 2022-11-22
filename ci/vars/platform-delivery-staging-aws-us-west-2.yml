@@ -16,4 +16,4 @@ vars_file: platform-delivery-staging-aws-us-west-2.yml
 argocd_project: product-services
 namespace: product-services
 customer: poplite
-tier: uat
+tier: production
