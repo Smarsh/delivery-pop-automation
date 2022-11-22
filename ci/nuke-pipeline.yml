@@ -52,57 +52,57 @@ jobs:
     serial: true
     plan:
       - in_parallel:
-        - get: delivery-tenants-api
+        - get: delivery-pop-automation
           trigger: true
-      - set_pipeline: nuke-ea-lite
-        file: delivery-tenants-api/ci/nuke-ea-lite-pipeline.yml
+      - set_pipeline: nuke-pipeline
+        file: delivery-pop-automation/ci/nuke-pipeline.yml
         var_files:
-          - delivery-tenants-api/ci/vars/platform-delivery-staging-aws-us-west-2.yml
+          - delivery-pop-automation/ci/vars/platform-delivery-staging-aws-us-west-2.yml
 
-  - name: nuke-ea-lite
+  - name: nuke-pipeline
     serial: true
     plan:
       - in_parallel:
-        - get: delivery-tenants-api
+        - get: delivery-pop-automation
           passed: [ set-pipeline ]
         - get: delivery-ci-all-image
       - in_parallel:
         - task: nuke-pipelines
           attempts: 1
-          file: delivery-tenants-api/ci/tasks/nuke-pipelines/task.yml
+          file: delivery-pop-automation/ci/tasks/nuke-pipelines/task.yml
           image: delivery-ci-all-image
           params:
             CONCOURSE_USERNAME: admin
             CONCOURSE_PASSWORD: ((app_concourse_admin_password))
         - task: nuke-apps
           attempts: 1
-          file: delivery-tenants-api/ci/tasks/pipeline-nuke-apps/task.yml
+          file: delivery-pop-automation/ci/tasks/pipeline-nuke-apps/task.yml
           image: delivery-ci-all-image
           params:
             CF_USERNAME: ((cf_username))
             CF_PASSWORD: ((cf_password))
         - task: nuke-spaces
           attempts: 1
-          file: delivery-tenants-api/ci/tasks/pipeline-nuke-spaces/task.yml
+          file: delivery-pop-automation/ci/tasks/pipeline-nuke-spaces/task.yml
           image: delivery-ci-all-image
           params:
             CF_USERNAME: ((cf_username))
             CF_PASSWORD: ((cf_password))
         - task: nuke-bosh-deployments
           attempts: 1
-          file: delivery-tenants-api/ci/tasks/pipeline-nuke-bosh-deployments/task.yml
+          file: delivery-pop-automation/ci/tasks/pipeline-nuke-bosh-deployments/task.yml
           image: delivery-ci-all-image
           params:
             <<: *bosh_creds
         - task: nuke-credhub-secrets
           attempts: 1
-          file: delivery-tenants-api/ci/tasks/pipeline-nuke-credhub-secrets/task.yml
+          file: delivery-pop-automation/ci/tasks/pipeline-nuke-credhub-secrets/task.yml
           image: delivery-ci-all-image
           params:
             <<: *credhub_params
         - task: nuke-github-commits
           attempts: 1
-          file: delivery-tenants-api/ci/tasks/pipeline-nuke-github-commits/task.yml
+          file: delivery-pop-automation/ci/tasks/pipeline-nuke-github-commits/task.yml
           image: delivery-ci-all-image
           params:
             OKTA_OAUTH2_CLIENT_ID: ((okta_oauth2_client_id_tenants_api))
@@ -110,26 +110,26 @@ jobs:
             GIT_PRIVATE_KEY: ((git-private-key))
         - task: nuke-slack-channel
           attempts: 1
-          file: delivery-tenants-api/ci/tasks/pipeline-nuke-slack-channel/task.yml
+          file: delivery-pop-automation/ci/tasks/pipeline-nuke-slack-channel/task.yml
           image: delivery-ci-all-image
           params:
             SLACK_EA_TENANTS_ADMIN_TOKEN: ((slack_ea_tenants_admin_token))
       - task: nuke-trigger-file
         attempts: 1
-        file: delivery-tenants-api/ci/tasks/pipeline-nuke-trigger-file/task.yml
+        file: delivery-pop-automation/ci/tasks/pipeline-nuke-trigger-file/task.yml
         image: delivery-ci-all-image
         params:
           GIT_PRIVATE_KEY: ((git-private-key))
       - task: nuke-tenant
         attempts: 1
-        file: delivery-tenants-api/ci/tasks/pipeline-nuke-tenant/task.yml
+        file: delivery-pop-automation/ci/tasks/pipeline-nuke-tenant/task.yml
         image: delivery-ci-all-image
         params:
           OKTA_OAUTH2_CLIENT_ID: ((okta_oauth2_client_id_tenants_api))
           OKTA_OAUTH2_CLIENT_SECRET: ((okta_oauth2_client_secret_tenants_api))
       - task: nuke-fleet-pipeline
         attempts: 1
-        file: delivery-tenants-api/ci/tasks/nuke-fleet-pipeline/task.yml
+        file: delivery-pop-automation/ci/tasks/nuke-fleet-pipeline/task.yml
         image: delivery-ci-all-image
         params:
           CONCOURSE_USERNAME: admin
@@ -139,11 +139,11 @@ jobs:
 
 resources:
 
-  - name: delivery-tenants-api
+  - name: delivery-pop-automation
     type: git
     source:
       private_key: ((github_private_key))
-      uri: git@github.com:Smarsh/delivery-tenants-api.git
+      uri: git@github.com:Smarsh/delivery-pop-automation.git
       branch: master
       ignore_paths: [version, delivery-ea-tenants-resource]
 
