@@ -44,7 +44,7 @@ groups:
   - name: all
     jobs:
       - set-pipeline
-      - nuke-pipeline
+      - nuke-pipeline-((customer))-((tier))
 
 jobs:
 

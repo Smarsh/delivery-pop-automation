@@ -10,5 +10,11 @@ WHITE="\e[0m"
 
 credhub login --skip-tls-validation
 # This line makes sure the delete always works.
-credhub set -n /concourse/platform-delivery-services/${CUSTOMER} -t 'value' --value ${CUSTOMER}
-credhub find -n ${CUSTOMER} | grep name: | cut -c9- | xargs -I {} credhub delete -n {}
+credhub set -n /concourse/platform-delivery-services/${CUSTOMER}-${REGION}-archive-${TIER}-dummy -t 'value' --value 'dummy'
+credhub find -n dummy | grep name: | cut -c9- | xargs -I {} credhub delete -n {}
+
+credhub set -n /concourse/platform-delivery-services/${CUSTOMER}-${TIER}-dummy -t 'value' --value 'dummy'
+credhub find -n dummy | grep name: | cut -c9- | xargs -I {} credhub delete -n {}
+
+credhub set -n /concourse/platform-delivery-services/${CUSTOMER}/${TIER}-dummy -t 'value' --value 'dummy'
+credhub find -n dummy | grep name: | cut -c9- | xargs -I {} credhub delete -n {}

@@ -127,7 +127,7 @@ try
     if [ -n "$(git status --porcelain)" ];
     then
       git add .
-      git commit -m ":sparkler:	Pipeline - Reverted vars files"
+      git commit -m ":sparkler:	${CUSTOMER} - Reverted vars files"
       git push
     fi
   fi
@@ -152,17 +152,17 @@ try
 
   echo -e ${GREEN}"Revert enterprise archive and email gateway files for ${CUSTOMER}"${WHITE}
 
-  ${CUSTOMER}_exists=$(cat config/enterprise-archive/spaces.yml | grep "${CUSTOMER}" >>/dev/null 2>&1;echo $?)
-  echo -e ${GREEN}"Poplite exists? ${${CUSTOMER}_exists}"${WHITE}
+  customer_exists=$(cat config/enterprise-archive/spaces.yml | grep "${CUSTOMER}" >>/dev/null 2>&1;echo $?)
+  echo -e ${GREEN}"Poplite exists? ${customer_exists}"${WHITE}
 
-  if [ "${CUSTOMER}_exists" -eq 0 ];
+  if [ "customer_exists" -eq 0 ];
   then
     line=$(grep -n "${CUSTOMER}" config/enterprise-archive/spaces.yml | cut -d: -f1)
     echo -e ${GREEN}"Revert spaces file"${WHITE}
     sed -i "${line},${line}d" config/enterprise-archive/spaces.yml
 
     git add .
-    git commit -m ":sparkler:	Pipeline - Reverted all PCF Spaces"
+    git commit -m ":sparkler:	${CUSTOMER} - Reverted all PCF Spaces"
     git push
   fi
 
@@ -180,7 +180,7 @@ try
     echo -e ${GREEN}"Revert enterprise archive files"${WHITE}
     git rm config/enterprise-archive/${CUSTOMER}-${TIER} -r
     git add .
-    git commit -m ":sparkler:	Pipeline - Reverted enterprise archive files"
+    git commit -m ":sparkler:	${CUSTOMER} - Reverted enterprise archive files"
     git push
   fi
 
@@ -221,7 +221,7 @@ try
   then
     echo -e ${GREEN}"Commit to GitHub"${WHITE}
     git add .
-    git commit -m ":sparkler:	Pipeline - Revert deployment files"
+    git commit -m ":sparkler:	${CUSTOMER} - Revert deployment files"
     git push
   else
     echo -e ${GREEN}"Nothing to commit"${WHITE}
