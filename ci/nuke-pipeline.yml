@@ -59,7 +59,7 @@ jobs:
         var_files:
           - delivery-pop-automation/ci/vars/platform-delivery-staging-aws-us-west-2.yml
 
-  - name: nuke-pipeline
+  - name: nuke-pipeline-((customer))-((tier))
     serial: true
     plan:
       - in_parallel:
@@ -145,7 +145,6 @@ resources:
       private_key: ((github_private_key))
       uri: git@github.com:Smarsh/delivery-pop-automation.git
       branch: master
-      ignore_paths: [version, delivery-ea-tenants-resource]
 
   - name: slack-alert
     type: slack-notification

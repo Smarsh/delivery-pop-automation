@@ -2,8 +2,6 @@
 
 set -euo pipefail
 
-region=us-west-2
-
 fly --target ${REGION}-enterprise-archive login -n enterprise-archive -c https://app-concourse.${REGION}.aws.smarsh.cloud -u $CONCOURSE_USERNAME -p $CONCOURSE_PASSWORD
 fly --target ${REGION}-enterprise-archive dp -p ea-key-generation-${CUSTOMER}-${TIER} -n
 fly --target ${REGION}-enterprise-archive dp -p ea-uaa-deploy-${CUSTOMER}-${TIER} -n

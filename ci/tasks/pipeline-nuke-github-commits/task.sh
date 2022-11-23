@@ -10,8 +10,6 @@ RED="\e[41m\e[37m\e[1m"
 YELLOW="\e[33m"
 WHITE="\e[0m"
 
-region=us-west-2
-
 echo -e ${GREEN}"___"${WHITE}
 echo -e ${GREEN}"Get auth token"${WHITE}
 echo -e ${GREEN}"___"${WHITE}
