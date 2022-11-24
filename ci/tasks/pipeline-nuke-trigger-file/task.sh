@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+export GIT_PRIVATE_KEY=${GIT_PRIVATE_KEY}
+export REGION=${REGION}
+export CUSTOMER=${CUSTOMER}
+export TIER=${TIER}
 
 source delivery-tenants-api/ci/tasks/pipeline-nuke-trigger-file/trycatch.sh
 

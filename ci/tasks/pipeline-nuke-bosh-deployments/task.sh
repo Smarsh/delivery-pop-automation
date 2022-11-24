@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+export CUSTOMER=${CUSTOMER}
+export TIER=${TIER}
 
 # Set colours
 GREEN="\e[32m"

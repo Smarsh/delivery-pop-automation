@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+export OKTA_OAUTH2_CLIENT_ID=${OKTA_OAUTH2_CLIENT_ID}
+export OKTA_OAUTH2_CLIENT_SECRET=${OKTA_OAUTH2_CLIENT_SECRET}
+export GIT_PRIVATE_KEY=${GIT_PRIVATE_KEY}
+export CUSTOMER=${CUSTOMER}
+export TIER=${TIER}
+export REGION=${REGION}
 
 source delivery-tenants-api/ci/tasks/pipeline-nuke-github-commits/trycatch.sh
 

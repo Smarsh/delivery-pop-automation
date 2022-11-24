@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+export SLACK_EA_TENANTS_ADMIN_TOKEN=${SLACK_EA_TENANTS_ADMIN_TOKEN}
+export CUSTOMER=${CUSTOMER}
 
 # Set colours
 GREEN="\e[32m"

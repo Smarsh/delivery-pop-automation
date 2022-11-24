@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+export CONCOURSE_USERNAME=${CONCOURSE_USERNAME}
+export CONCOURSE_PASSWORD=${CONCOURSE_PASSWORD}
+export CUSTOMER=${CUSTOMER}
+export REGION=${REGION}
 
 # Set colours
 GREEN="\e[32m"

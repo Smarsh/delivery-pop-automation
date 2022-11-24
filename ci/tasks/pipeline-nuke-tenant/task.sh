@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+export OKTA_OAUTH2_CLIENT_ID=${OKTA_OAUTH2_CLIENT_ID}
+export OKTA_OAUTH2_CLIENT_SECRET=${OKTA_OAUTH2_CLIENT_SECRET}
+export CUSTOMER=${CUSTOMER}
 
 # Set colours
 GREEN="\e[32m"
