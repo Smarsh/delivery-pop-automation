@@ -7,6 +7,8 @@ export GIT_PRIVATE_KEY=${GIT_PRIVATE_KEY}
 export CUSTOMER=${CUSTOMER}
 export TIER=${TIER}
 export REGION=${REGION}
+export FLOW_TYPE=${FLOW_TYPE}
+export TENANT_NAME=${TENANT_NAME}
 
 source delivery-tenants-api/ci/tasks/pipeline-nuke-github-commits/trycatch.sh
 
@@ -85,8 +87,8 @@ try
   git clone "git@github.com:Smarsh/delivery-ea-versions.git"
   pushd delivery-ea-versions
 
-  delete=$(git push -d origin ${CLOUD}-${REGION}-${CUSTOMER}-${TIER} >>/dev/null 2>&1;echo $?)
-  delete=$(git branch -d ${CLOUD}-${REGION}-${CUSTOMER}-${TIER} >>/dev/null 2>&1;echo $?)
+  delete=$(git push -d origin "${CLOUD}-${REGION}-${CUSTOMER}-${TIER}" >>/dev/null 2>&1;echo $?)
+  delete=$(git branch -d "${CLOUD}-${REGION}-${CUSTOMER}-${TIER}" >>/dev/null 2>&1;echo $?)
 
   popd
   echo -e ${GREEN}"Finished reverting delivery-ea-versions"${WHITE}
@@ -108,10 +110,10 @@ try
 
   echo -e ${GREEN}"Revert vars files"${WHITE}
 
-  varsexist=$(find . -name '*${CLOUD}-${REGION}-${CUSTOMER}-${TIER}*')
+  varsexist=$(find . -name "*${CLOUD}-${REGION}-${CUSTOMER}-${TIER}*")
   if [ "$varsexist" ]
   then
-    find . -name '*${CLOUD}-${REGION}-${CUSTOMER}-${TIER}*' -exec git rm {} \;
+    find . -name "*${CLOUD}-${REGION}-${CUSTOMER}-${TIER}*" -exec git rm {} \;
 
     echo -e ${GREEN}"Revert template file"${WHITE}
 
@@ -159,7 +161,7 @@ try
   echo -e ${GREEN}"Revert enterprise archive and email gateway files for ${CUSTOMER}"${WHITE}
 
   customer_exists=$(cat config/enterprise-archive/spaces.yml | grep "${CUSTOMER}" >>/dev/null 2>&1;echo $?)
-  echo -e ${GREEN}"Poplite exists? ${customer_exists}"${WHITE}
+  echo -e ${GREEN}"Customer exists? ${customer_exists}"${WHITE}
 
   if [ "customer_exists" -eq 0 ];
   then

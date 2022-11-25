@@ -45,11 +45,11 @@ try
   git config user.name "Concourse CI Bot"
   git config user.email "ci@localhost"
 
-  triggerfileexists=$(find . -name 'trigger-${CLOUD}-${REGION}-${CUSTOMER}-${TIER}')
+  triggerfileexists=$(find . -name "trigger-${CLOUD}-${REGION}-${CUSTOMER}-${TIER}")
   if [ "$triggerfileexists" ]
   then
     echo -e ${GREEN}"Deleting trigger file"${WHITE}
-    find . -name 'trigger-${CLOUD}-${REGION}-${CUSTOMER}-${TIER}' -exec git rm {} \;
+    find . -name "trigger-${CLOUD}-${REGION}-${CUSTOMER}-${TIER}" -exec git rm {} \;
 
     if [ -n "$(git status --porcelain)" ];
     then

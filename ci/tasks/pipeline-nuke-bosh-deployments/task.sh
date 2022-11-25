@@ -10,11 +10,11 @@ RED="\e[41m\e[37m\e[1m"
 YELLOW="\e[33m"
 WHITE="\e[0m"
 
-bosh_${CUSTOMER}_exists=$(bosh deps --column name | grep ${CUSTOMER} >>/dev/null 2>&1;echo $?)
-if [ "$bosh_${CUSTOMER}_exists" -eq 0 ];
+bosh_customer_exists=$(bosh deps --column name | grep ${CUSTOMER} >>/dev/null 2>&1;echo $?)
+if [ "$bosh_customer_exists" -eq 0 ];
 then
   echo -e ${GREEN}"Deleting Bosh deployments"${WHITE}
-  bosh deps --column name | grep ${CUSTOMER} | awk '{print $1}' | xargs -I {} bosh -n -d {} delete-deployment
+  bosh deps --column name | grep "${CUSTOMER}-*" | awk '{print $1}' | xargs -I {} bosh -n -d {} delete-deployment
 
   bosh_deps_deleted=$(bosh deps --column name | grep ${CUSTOMER} >>/dev/null 2>&1;echo $?)
   if [ "$bosh_deps_deleted" -eq 0 ];
