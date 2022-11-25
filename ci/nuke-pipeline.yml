@@ -74,6 +74,9 @@ jobs:
           params:
             CONCOURSE_USERNAME: admin
             CONCOURSE_PASSWORD: ((app_concourse_admin_password))
+            CUSTOMER: ((customer))
+            TIER: ((tier))
+            REGION: ((region))
         - task: nuke-apps
           attempts: 1
           file: delivery-pop-automation/ci/tasks/pipeline-nuke-apps/task.yml
@@ -81,6 +84,9 @@ jobs:
           params:
             CF_USERNAME: ((cf_username))
             CF_PASSWORD: ((cf_password))
+            CUSTOMER: ((customer))
+            REGION: ((region))
+            TIER: ((tier))
         - task: nuke-spaces
           attempts: 1
           file: delivery-pop-automation/ci/tasks/pipeline-nuke-spaces/task.yml
@@ -88,6 +94,8 @@ jobs:
           params:
             CF_USERNAME: ((cf_username))
             CF_PASSWORD: ((cf_password))
+            CUSTOMER: ((customer))
+            REGION: ((region))
         - task: nuke-bosh-deployments
           attempts: 1
           file: delivery-pop-automation/ci/tasks/pipeline-nuke-bosh-deployments/task.yml
@@ -108,18 +116,28 @@ jobs:
             OKTA_OAUTH2_CLIENT_ID: ((okta_oauth2_client_id_tenants_api))
             OKTA_OAUTH2_CLIENT_SECRET: ((okta_oauth2_client_secret_tenants_api))
             GIT_PRIVATE_KEY: ((git-private-key))
+            CUSTOMER: ((customer))
+            REGION: ((region))
+            TIER: ((tier))
+            FLOW_TYPE: ((flow_type))
+            ENVIRONMENT_TYPE: ((environment_type))
+            TENANT_NAME: ((tenant_name))
         - task: nuke-slack-channel
           attempts: 1
           file: delivery-pop-automation/ci/tasks/pipeline-nuke-slack-channel/task.yml
           image: delivery-ci-all-image
           params:
             SLACK_EA_TENANTS_ADMIN_TOKEN: ((slack_ea_tenants_admin_token))
+            CUSTOMER: ((customer))
       - task: nuke-trigger-file
         attempts: 1
         file: delivery-pop-automation/ci/tasks/pipeline-nuke-trigger-file/task.yml
         image: delivery-ci-all-image
         params:
           GIT_PRIVATE_KEY: ((git-private-key))
+          CUSTOMER: ((customer))
+          REGION: ((region))
+          TIER: ((tier))
       - task: nuke-tenant
         attempts: 1
         file: delivery-pop-automation/ci/tasks/pipeline-nuke-tenant/task.yml
@@ -127,6 +145,10 @@ jobs:
         params:
           OKTA_OAUTH2_CLIENT_ID: ((okta_oauth2_client_id_tenants_api))
           OKTA_OAUTH2_CLIENT_SECRET: ((okta_oauth2_client_secret_tenants_api))
+          CUSTOMER: ((customer))
+          FLOW_TYPE: ((flow_type))
+          ENVIRONMENT_TYPE: ((environment_type))
+          TENANT_NAME: ((tenant_name))
       - task: nuke-fleet-pipeline
         attempts: 1
         file: delivery-pop-automation/ci/tasks/nuke-fleet-pipeline/task.yml
@@ -134,6 +156,9 @@ jobs:
         params:
           CONCOURSE_USERNAME: admin
           CONCOURSE_PASSWORD: ((app_concourse_admin_password))
+          CUSTOMER: ((customer))
+          TIER: ((tier))
+          REGION: ((region))
 
     <<: *slack-alerts
 

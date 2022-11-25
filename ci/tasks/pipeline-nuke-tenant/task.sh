@@ -35,9 +35,9 @@ echo -e ${GREEN}"___"${WHITE}
 echo -e ${GREEN}"Find tenant"${WHITE}
 echo -e ${GREEN}"___"${WHITE}
 
-http_code=$(curl -LI --location --request GET "${API_URL}/tenants?page=0&size=1&customer-name=${CUSTOMER}" -o /dev/null --header 'Content-Type: application/json' --header 'Accept: application/json' --header "Authorization: Bearer $AUTH_TOKEN" -w '%{http_code}\n' -s)
+http_code=$(curl -LI --location --request GET "${API_URL}/tenants?page=0&size=1&customer-name=${CUSTOMER}&region=${REGION}&environment-type=${TIER}&flow-type=${FLOW_TYPE}&tenant-name=${TENANT_NAME}" -o /dev/null --header 'Content-Type: application/json' --header 'Accept: application/json' --header "Authorization: Bearer $AUTH_TOKEN" -w '%{http_code}\n' -s)
 if [ ${http_code} -eq 200 ]; then
-    TENANT_ID=$(curl --location --request GET "${API_URL}/tenants?page=0&size=1&customer-name=${CUSTOMER}" \
+    TENANT_ID=$(curl --location --request GET "${API_URL}/tenants?page=0&size=1&customer-name=${CUSTOMER}&region=${REGION}&environment-type=${TIER}&flow-type=${FLOW_TYPE}&tenant-name=${TENANT_NAME}" \
       --header 'Content-Type: application/json' \
       --header 'Accept: application/json' \
       --header "Authorization: Bearer $AUTH_TOKEN" | jq '.[0].id')
