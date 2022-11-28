@@ -54,10 +54,10 @@ jobs:
       - in_parallel:
         - get: delivery-pop-automation
           trigger: true
-      - set_pipeline: nuke-pipeline
+      - set_pipeline: nuke-pipeline-((customer))-((tier))
         file: delivery-pop-automation/ci/nuke-pipeline.yml
         var_files:
-          - delivery-pop-automation/ci/vars/platform-delivery-staging-aws-us-west-2.yml
+          - delivery-pop-automation/ci/vars/((cloud))-((region))-((customer))-((tier)).yml
 
   - name: nuke-pipeline-((customer))-((tier))
     serial: true

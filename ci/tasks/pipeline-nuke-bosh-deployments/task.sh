@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-export CUSTOMER=${CUSTOMER}
-export TIER=${TIER}
+: "${CUSTOMER:?CUSTOMER env var must be provided}"
+: "${TIER:?TIER env var must be provided}"
+
 
 # Set colours
 GREEN="\e[32m"

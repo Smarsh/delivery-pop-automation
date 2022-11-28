@@ -10,3 +10,6 @@ run:
 params:
   SLACK_EA_TENANTS_ADMIN_TOKEN:
   CUSTOMER:
+  CLOUD:
+  REGION:
+  TIER:

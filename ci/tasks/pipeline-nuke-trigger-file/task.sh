@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-export GIT_PRIVATE_KEY=${GIT_PRIVATE_KEY}
-export REGION=${REGION}
-export CUSTOMER=${CUSTOMER}
-export TIER=${TIER}
+: "${REGION:?REGION env var must be provided}"
+: "${CUSTOMER:?CUSTOMER env var must be provided}"
+: "${GIT_PRIVATE_KEY:?GIT_PRIVATE_KEY env var must be provided}"
+: "${TIER:?TIER env var must be provided}"
 
 source delivery-tenants-api/ci/tasks/pipeline-nuke-trigger-file/trycatch.sh
 

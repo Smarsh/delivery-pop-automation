@@ -13,4 +13,7 @@ params:
   CUSTOMER:
   FLOW_TYPE:
   TENANT_NAME:
+  REGION:
+  TIER:
+
 

@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-export SLACK_EA_TENANTS_ADMIN_TOKEN=${SLACK_EA_TENANTS_ADMIN_TOKEN}
-export CUSTOMER=${CUSTOMER}
+: "${CUSTOMER:?CUSTOMER env var must be provided}"
+: "${SLACK_EA_TENANTS_ADMIN_TOKEN:?SLACK_EA_TENANTS_ADMIN_TOKEN env var must be provided}"
+: "${REGION:?REGION env var must be provided}"
+: "${TIER:?TIER env var must be provided}"
+: "${CLOUD:?CLOUD env var must be provided}"
+
 
 # Set colours
 GREEN="\e[32m"

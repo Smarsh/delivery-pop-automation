@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-export CONCOURSE_USERNAME=${CONCOURSE_USERNAME}
-export CONCOURSE_PASSWORD=${CONCOURSE_PASSWORD}
-export CUSTOMER=${CUSTOMER}
-export REGION=${REGION}
+: "${CONCOURSE_USERNAME:?CONCOURSE_USERNAME env var must be provided}"
+: "${CONCOURSE_PASSWORD:?CONCOURSE_PASSWORD env var must be provided}"
+: "${REGION:?REGION env var must be provided}"
+: "${CUSTOMER:?CUSTOMER env var must be provided}"
 
 # Set colours
 GREEN="\e[32m"

@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-export OKTA_OAUTH2_CLIENT_ID=${OKTA_OAUTH2_CLIENT_ID}
-export OKTA_OAUTH2_CLIENT_SECRET=${OKTA_OAUTH2_CLIENT_SECRET}
-export CUSTOMER=${CUSTOMER}
-export FLOW_TYPE=${FLOW_TYPE}
-export TENANT_NAME=${TENANT_NAME}
-
+: "${OKTA_OAUTH2_CLIENT_ID:?OKTA_OAUTH2_CLIENT_ID env var must be provided}"
+: "${OKTA_OAUTH2_CLIENT_SECRET:?OKTA_OAUTH2_CLIENT_SECRET env var must be provided}"
+: "${REGION:?REGION env var must be provided}"
+: "${CUSTOMER:?CUSTOMER env var must be provided}"
+: "${FLOW_TYPE:?FLOW_TYPE env var must be provided}"
+: "${TIER:?TIER env var must be provided}"
+: "${TENANT_NAME:?TENANT_NAME env var must be provided}"
 
 # Set colours
 GREEN="\e[32m"

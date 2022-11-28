@@ -8,8 +8,7 @@ run:
   path: delivery-pop-automation/ci/tasks/pipeline-nuke-credhub-secrets/task.sh
 
 params:
-  CREDHUB_SERVER:
-  CREDHUB_CLIENT:
-  CREDHUB_SECRET:
   CUSTOMER:
+  REGION:
+  TIER:
 
