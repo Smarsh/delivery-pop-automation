@@ -44,7 +44,7 @@ groups:
   - name: all
     jobs:
       - set-pipeline
-      - nuke-pipeline-((customer))-((tier))
+      - nuke-all
 
 jobs:
 
@@ -59,7 +59,7 @@ jobs:
         var_files:
           - delivery-pop-automation/ci/vars/platform-delivery-((tier))-((cloud))-((region)).yml
 
-  - name: nuke-pipeline-((customer))-((tier))
+  - name: nuke-all
     serial: true
     plan:
       - in_parallel:
