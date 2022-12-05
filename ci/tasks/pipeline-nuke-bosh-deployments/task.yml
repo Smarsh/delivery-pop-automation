@@ -2,9 +2,11 @@
 platform: linux
 
 inputs:
-  - name: delivery-tenants-api
+  - name: delivery-pop-automation
 
 run:
-  path: delivery-tenants-api/ci/tasks/poplite-nuke-bosh-deployments/task.sh
+  path: delivery-pop-automation/ci/tasks/pipeline-nuke-bosh-deployments/task.sh
 
 params:
+  CUSTOMER:
+  TIER:

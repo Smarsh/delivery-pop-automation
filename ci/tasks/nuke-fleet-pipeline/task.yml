@@ -5,11 +5,12 @@ inputs:
   - name: delivery-pop-automation
 
 run:
-  path: delivery-tenants-api/ci/tasks/nuke-fleet-pipeline/task.sh
+  path: delivery-pop-automation/ci/tasks/nuke-fleet-pipeline/task.sh
 
 params:
   CONCOURSE_USERNAME:
   CONCOURSE_PASSWORD:
   CUSTOMER:
   TIER:
+  REGION:
 
