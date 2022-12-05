@@ -50,15 +50,15 @@ git clone git@github.com:Smarsh/${GH_REPO}.git
 
 cd ${GH_REPO}
 
-if [[ -f "${ENVIRONMENT_NAME}.yml" ]]; then
-  echo -e $YELLOW"Deployment file for ${ENVIRONMENT_NAME} already exists - skipping"$WHITE
+if [[ -f "ci/vars/${ENVIRONMENT_NAME}.yml" ]]; then
+  echo -e $YELLOW"Vars file ${ENVIRONMENT_NAME} already exists - skipping"$WHITE
 else
-  echo -e $GREEN"Creating deployment file for ${ENVIRONMENT_NAME}"$WHITE
-  cp template.yml ${ENVIRONMENT_NAME}.yml
+  echo -e $GREEN"Creating vars file for ${ENVIRONMENT_NAME}"$WHITE
+  cp ci/vars/template.yml ci/vars/${ENVIRONMENT_NAME}.yml
 
   echo -e $GREEN"environment variables substitution for ${ENVIRONMENT_NAME}"$WHITE
-  envsubst < ${ENVIRONMENT_NAME}.yml > temp.yml && mv temp.yml ${ENVIRONMENT_NAME}.yml
+  envsubst < ci/vars/${ENVIRONMENT_NAME}.yml > temp.yml && mv temp.yml ci/vars/${ENVIRONMENT_NAME}.yml
 fi
-update_repo
 
-  echo -e $GREEN"Done"$WHITE
+update_repo
+echo -e $GREEN"Done"$WHITE
