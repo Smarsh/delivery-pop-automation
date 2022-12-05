@@ -2,9 +2,9 @@
 number_of_instances: 1
 disk_quota: 3G
 memory: 2G
-dd_tag: env:smarsh-${SERVICE_REGION}-platform_core-sandbox,segment:enterprise,product:enterprise-archive
+dd_tag: env:${CUSTOMER}-{SERVICE_REGION}-platform_core-sandbox,segment:enterprise,product:enterprise-archive
 dd_service: delivery-tenants-api
-dd_env: ${CLOUD}-${REGION}-${CUSTOMER}-{TIER}
+dd_env: ${CLOUD}-${REGION}-${CUSTOMER}-${TIER}
 space: platform-delivery-services
 org: platform
 api: https://api.sys.${REGION}.${CLOUD}.${CUSTOMER}.cloud
@@ -12,10 +12,10 @@ pipeline_name: delivery-tenants-api
 us_east_1_concourse_password: not-applicable
 region: ${REGION}
 cf_api: https://api.sys.${REGION}.${CLOUD}.${CUSTOMER}.cloud
-vars_file: platform-delivery-{TIER}-${CLOUD}-${REGION}.yml
+vars_file: platform-delivery-${TIER}-${CLOUD}-${REGION}.yml
 argocd_project: product-services
 namespace: product-services
-customer: ${CUSTOMER}
+customer: £{CUSTOMER}
 tier: ${TIER}
-flow-type: mt_st_first
-tenant_name: msanity
+flow_type: ${FLOW_TYPE}
+tenant_name: ${TENANT_NAME}
