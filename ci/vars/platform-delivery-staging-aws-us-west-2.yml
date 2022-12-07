@@ -11,6 +11,7 @@ api: https://api.sys.us-west-2.aws.smarsh.cloud
 pipeline_name: delivery-tenants-api
 us_east_1_concourse_password: not-applicable
 region: us-west-2
+service_region: nam
 cf_api: https://api.sys.us-west-2.aws.smarsh.cloud
 vars_file: platform-delivery-staging-aws-us-west-2.yml
 argocd_project: product-services
