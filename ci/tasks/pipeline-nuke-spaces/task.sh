@@ -5,6 +5,7 @@ set -euo pipefail
 : "${CONCOURSE_PASSWORD:?CONCOURSE_PASSWORD env var must be provided}"
 : "${REGION:?REGION env var must be provided}"
 : "${CUSTOMER:?CUSTOMER env var must be provided}"
+: "${TIER:?TIER env var must be provided}"
 
 # Set colours
 GREEN="\e[32m"
@@ -15,19 +16,19 @@ WHITE="\e[0m"
 function delete_customer_space(){
   ORG=${1}
   cf target -o ${ORG}
-  echo -e ${GREEN}"Check if the customer-production space exists"${WHITE}
-  customer_exists=$(cf spaces | grep ${CUSTOMER}-production >>/dev/null 2>&1;echo $?)
-  echo -e ${GREEN}"Production: $customer_exists"${WHITE}
+  echo -e ${GREEN}"Check if the customer space exists"${WHITE}
+  customer_exists=$(cf spaces | grep ${CUSTOMER}-${TIER} >>/dev/null 2>&1;echo $?)
+  echo -e ${GREEN}"Exists?: $customer_exists"${WHITE}
   if [ "$customer_exists" -eq  0 ]
   then
     echo -e ${GREEN}"Change target"${WHITE}
-    cf target -o ${ORG} -s ${CUSTOMER}-production
+    cf target -o ${ORG} -s ${CUSTOMER}-${TIER}
 
     echo -e ${GREEN}"Delete space"${WHITE}
-    space_deleted=$(cf delete-space ${CUSTOMER}-production -f >>/dev/null 2>&1;echo $?)
+    space_deleted=$(cf delete-space ${CUSTOMER}-${TIER} -f >>/dev/null 2>&1;echo $?)
     while [ "$space_deleted" -ne 0 ]
     do
-      space_deleted=$(cf delete-space ${CUSTOMER}-production -f >>/dev/null 2>&1;echo $?)
+      space_deleted=$(cf delete-space ${CUSTOMER}-${TIER} -f >>/dev/null 2>&1;echo $?)
     done
   fi
 
