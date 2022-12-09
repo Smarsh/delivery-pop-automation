@@ -121,8 +121,7 @@ jobs:
             OKTA_OAUTH2_CLIENT_ID: ((okta_oauth2_client_id_tenants_api))
             OKTA_OAUTH2_CLIENT_SECRET: ((okta_oauth2_client_secret_tenants_api))
             GIT_PRIVATE_KEY: ((github_private_key))
-            FLOW_TYPE: ((flow_type))
-            ENVIRONMENT_TYPE: ((environment_type))
+            FLOW_TYPE: mt_st_first
             TENANT_NAME: msanity
             <<: *deployment_identifier
         - task: nuke-slack-channel
@@ -147,8 +146,7 @@ jobs:
           OKTA_OAUTH2_CLIENT_ID: ((okta_oauth2_client_id_tenants_api))
           OKTA_OAUTH2_CLIENT_SECRET: ((okta_oauth2_client_secret_tenants_api))
           <<: *deployment_identifier
-          FLOW_TYPE: ((flow_type))
-          ENVIRONMENT_TYPE: ((environment_type))
+          FLOW_TYPE: mt_st_first
           TENANT_NAME: msanity
       - task: nuke-fleet-pipeline
         attempts: 1

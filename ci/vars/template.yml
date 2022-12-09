@@ -3,5 +3,3 @@ customer: ${CUSTOMER}
 tier: ${TIER}
 region: ${REGION}
 service_region: ${SERVICE_REGION}
-flow_type: ${FLOW_TYPE}
-tenant_name: "${TENANT_NAME}"

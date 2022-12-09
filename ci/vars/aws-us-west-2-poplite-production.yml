@@ -3,4 +3,3 @@ customer: poplite
 tier: production
 region: us-west-2
 service_region: nam
-flow_type: mt_st_first
