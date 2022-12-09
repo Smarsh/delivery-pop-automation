@@ -65,8 +65,8 @@ jobs:
       - in_parallel:
         - get: delivery-pop-automation
           trigger: true
-      - set_pipeline: nuke-pipeline-((customer))-((tier))
-        file: delivery-pop-automation/ci/nuke-pipeline-st.yml
+      - set_pipeline: ea-nuke-pipeline-((customer))-((tier))
+        file: delivery-pop-automation/ci/ea-nuke-pipeline-st.yml
         var_files:
           - delivery-pop-automation/ci/vars/((cloud))-((region))-((customer))-((tier)).yml
 
