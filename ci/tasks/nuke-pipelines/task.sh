@@ -6,6 +6,9 @@ set -euo pipefail
 : "${CUSTOMER:?CUSTOMER env var must be provided}"
 : "${TIER:?TIER env var must be provided}"
 : "${REGION:?REGION env var must be provided}"
+: "${SERVICE_REGION:?SERVICE_REGION env var must be provided}"
+
+
 
 fly --target ${REGION}-enterprise-archive login -n enterprise-archive -c https://app-concourse.${REGION}.aws.smarsh.cloud -u $CONCOURSE_USERNAME -p $CONCOURSE_PASSWORD
 fly --target ${REGION}-enterprise-archive dp -p ea-key-generation-${CUSTOMER}-${TIER} -n
@@ -19,12 +22,12 @@ fly --target ${REGION}-platform-product-services dp -p ehms-${CUSTOMER}-${TIER} 
 fly --target ${REGION}-platform-product-services dp -p iss-${CUSTOMER}-${TIER} -n
 
 fly --target ${REGION}-paasdataservices login -b -n paasdataservices -c https://app-concourse.${REGION}.aws.smarsh.cloud -u $CONCOURSE_USERNAME -p $CONCOURSE_PASSWORD
-fly --target ${REGION}-paasdataservices dp -p ${CUSTOMER}-nam-archive-${TIER}-site -n
-fly --target ${REGION}-paasdataservices dp -p ${CUSTOMER}-nam-archive-${TIER}-shared -n
-fly --target ${REGION}-paasdataservices dp -p ${CUSTOMER}-nam-archive-${TIER}-data -n
-fly --target ${REGION}-paasdataservices dp -p ${CUSTOMER}-nam-archive-${TIER}-report -n
-fly --target ${REGION}-paasdataservices dp -p ${CUSTOMER}-nam-archive-${TIER}-supervision -n
-fly --target ${REGION}-paasdataservices dp -p ${CUSTOMER}-nam-archive-${TIER}-msg_brokers -n
+fly --target ${REGION}-paasdataservices dp -p ${CUSTOMER}-${SERVICE_REGION}-archive-${TIER}-site -n
+fly --target ${REGION}-paasdataservices dp -p ${CUSTOMER}-${SERVICE_REGION}-archive-${TIER}-shared -n
+fly --target ${REGION}-paasdataservices dp -p ${CUSTOMER}-${SERVICE_REGION}-archive-${TIER}-data -n
+fly --target ${REGION}-paasdataservices dp -p ${CUSTOMER}-${SERVICE_REGION}-archive-${TIER}-report -n
+fly --target ${REGION}-paasdataservices dp -p ${CUSTOMER}-${SERVICE_REGION}-archive-${TIER}-supervision -n
+fly --target ${REGION}-paasdataservices dp -p ${CUSTOMER}-${SERVICE_REGION}-archive-${TIER}-msg_brokers -n
 
 fly --target ${REGION}-sreapps login -b -n sreapps -c https://app-concourse.${REGION}.aws.smarsh.cloud -u $CONCOURSE_USERNAME -p $CONCOURSE_PASSWORD
 fly --target ${REGION}-sreapps dp -p pipeline_lag_drain_script-${CUSTOMER}-${TIER} -n
