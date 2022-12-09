@@ -24,12 +24,13 @@ function delete_customer_space(){
     echo -e ${GREEN}"Change target"${WHITE}
     cf target -o ${ORG} -s ${CUSTOMER}-${TIER}
 
-    echo -e ${GREEN}"Delete space"${WHITE}
-    space_deleted=$(cf delete-space ${CUSTOMER}-${TIER} -f >>/dev/null 2>&1;echo $?)
-    while [ "$space_deleted" -ne 0 ]
-    do
-      space_deleted=$(cf delete-space ${CUSTOMER}-${TIER} -f >>/dev/null 2>&1;echo $?)
-    done
+    echo -e ${GREEN}"Delete space ${CUSTOMER}-${TIER}"${WHITE}
+    #DRY RUN
+    # space_deleted=$(cf delete-space ${CUSTOMER}-${TIER} -f >>/dev/null 2>&1;echo $?)
+    # while [ "$space_deleted" -ne 0 ]
+    # do
+    #   space_deleted=$(cf delete-space ${CUSTOMER}-${TIER} -f >>/dev/null 2>&1;echo $?)
+    # done
   fi
 
 }

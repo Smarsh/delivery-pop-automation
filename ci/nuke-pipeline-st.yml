@@ -113,17 +113,18 @@ jobs:
           params:
             <<: *credhub_connection_details
             <<: *deployment_identifier
-        - task: nuke-github-commits
-          attempts: 1
-          file: delivery-pop-automation/ci/tasks/pipeline-nuke-github-commits/task.yml
-          image: delivery-ci-all-image
-          params:
-            OKTA_OAUTH2_CLIENT_ID: ((okta_oauth2_client_id_tenants_api))
-            OKTA_OAUTH2_CLIENT_SECRET: ((okta_oauth2_client_secret_tenants_api))
-            GIT_PRIVATE_KEY: ((github_private_key))
-            FLOW_TYPE: mt_st_first
-            TENANT_NAME: msanity
-            <<: *deployment_identifier
+        #DRY RUN
+        # - task: nuke-github-commits
+          # attempts: 1
+          # file: delivery-pop-automation/ci/tasks/pipeline-nuke-github-commits/task.yml
+          # image: delivery-ci-all-image
+          # params:
+          #   OKTA_OAUTH2_CLIENT_ID: ((okta_oauth2_client_id_tenants_api))
+          #   OKTA_OAUTH2_CLIENT_SECRET: ((okta_oauth2_client_secret_tenants_api))
+          #   GIT_PRIVATE_KEY: ((github_private_key))
+          #   FLOW_TYPE: mt_st_first
+          #   TENANT_NAME: msanity
+          #   <<: *deployment_identifier
         - task: nuke-slack-channel
           attempts: 1
           file: delivery-pop-automation/ci/tasks/pipeline-nuke-slack-channel/task.yml
@@ -131,23 +132,23 @@ jobs:
           params:
             SLACK_EA_TENANTS_ADMIN_TOKEN: ((slack_ea_tenants_admin_token))
             <<: *deployment_identifier
-      - task: nuke-trigger-file
-        attempts: 1
-        file: delivery-pop-automation/ci/tasks/pipeline-nuke-trigger-file/task.yml
-        image: delivery-ci-all-image
-        params:
-          GIT_PRIVATE_KEY: ((github_private_key))
-          <<: *deployment_identifier
-      - task: nuke-tenant
-        attempts: 1
-        file: delivery-pop-automation/ci/tasks/pipeline-nuke-tenant/task.yml
-        image: delivery-ci-all-image
-        params:
-          OKTA_OAUTH2_CLIENT_ID: ((okta_oauth2_client_id_tenants_api))
-          OKTA_OAUTH2_CLIENT_SECRET: ((okta_oauth2_client_secret_tenants_api))
-          <<: *deployment_identifier
-          FLOW_TYPE: mt_st_first
-          TENANT_NAME: msanity
+      # - task: nuke-trigger-file
+      #   attempts: 1
+      #   file: delivery-pop-automation/ci/tasks/pipeline-nuke-trigger-file/task.yml
+      #   image: delivery-ci-all-image
+      #   params:
+      #     GIT_PRIVATE_KEY: ((github_private_key))
+      #     <<: *deployment_identifier
+      # - task: nuke-tenant
+      #   attempts: 1
+      #   file: delivery-pop-automation/ci/tasks/pipeline-nuke-tenant/task.yml
+      #   image: delivery-ci-all-image
+      #   params:
+      #     OKTA_OAUTH2_CLIENT_ID: ((okta_oauth2_client_id_tenants_api))
+      #     OKTA_OAUTH2_CLIENT_SECRET: ((okta_oauth2_client_secret_tenants_api))
+      #     <<: *deployment_identifier
+      #     FLOW_TYPE: mt_st_first
+      #     TENANT_NAME: msanity
       - task: nuke-fleet-pipeline
         attempts: 1
         file: delivery-pop-automation/ci/tasks/nuke-fleet-pipeline/task.yml
