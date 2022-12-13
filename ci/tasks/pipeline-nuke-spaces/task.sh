@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-: "${CONCOURSE_USERNAME:?CONCOURSE_USERNAME env var must be provided}"
-: "${CONCOURSE_PASSWORD:?CONCOURSE_PASSWORD env var must be provided}"
+
 : "${REGION:?REGION env var must be provided}"
 : "${CUSTOMER:?CUSTOMER env var must be provided}"
 : "${TIER:?TIER env var must be provided}"
