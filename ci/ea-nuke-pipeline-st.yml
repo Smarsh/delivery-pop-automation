@@ -115,6 +115,7 @@ jobs:
             CUSTOMER: ((customer))
             REGION: ((region))
             TIER: ((tier))
+            REGION_BUCKET_SUFFIX: ((region_bucket_suffix))
         - task: nuke-credhub-secrets
           attempts: 1
           file: delivery-pop-automation/ci/tasks/pipeline-nuke-credhub-secrets/task.yml

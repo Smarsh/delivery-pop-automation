@@ -3,3 +3,4 @@ customer: multicustomer
 tier: production
 region: eu-west-2
 service_region: emea
+region_bucket_suffix: euwest2
