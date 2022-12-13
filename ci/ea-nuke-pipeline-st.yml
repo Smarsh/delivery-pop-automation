@@ -24,19 +24,30 @@ meta:
 
 anchors:
 
-  <<: &bosh_creds
+  <<: &bosh_connection_details
     BOSH_CA_CERT: |
       ((bosh_sidecar_ca_cert))
     BOSH_CLIENT: ((bosh_sidecar_client))
     BOSH_CLIENT_SECRET: ((bosh_sidecar_client_secret))
     BOSH_ENVIRONMENT: ((bosh_sidecar_environment))
 
-  <<: &credhub_params
+  <<: &credhub_connection_details
     CREDHUB_CLIENT: ((credhub_client))
     CREDHUB_SECRET: ((credhub_secret))
     CREDHUB_SERVER: ((credhub_server))
+
+  <<: &concourse_connection_details
+    CONCOURSE_USERNAME: ci-delivery
+    CONCOURSE_PASSWORD: ((app_concourse_password))
+
+  <<: &cf_connection_details
+    CF_USERNAME: ((cf_username))
+    CF_PASSWORD: ((cf_password))
+
+  <<: &deployment_identifier
     CUSTOMER: ((customer))
     REGION: ((region))
+    SERVICE_REGION: ((service_region))
     TIER: ((tier))
 
 groups:
@@ -54,10 +65,10 @@ jobs:
       - in_parallel:
         - get: delivery-pop-automation
           trigger: true
-      - set_pipeline: nuke-pipeline-((customer))-((tier))
-        file: delivery-pop-automation/ci/nuke-pipeline.yml
+      - set_pipeline: ea-nuke-pipeline-((customer))-((tier))
+        file: delivery-pop-automation/ci/ea-nuke-pipeline-st.yml
         var_files:
-          - delivery-pop-automation/ci/vars/platform-delivery-((tier))-((cloud))-((region)).yml
+          - delivery-pop-automation/ci/vars/((cloud))-((region))-((customer))-((tier)).yml
 
   - name: nuke-all
     serial: true
@@ -73,36 +84,29 @@ jobs:
           file: delivery-pop-automation/ci/tasks/nuke-pipelines/task.yml
           image: delivery-ci-all-image
           params:
-            CONCOURSE_USERNAME: admin
-            CONCOURSE_PASSWORD: ((app_concourse_admin_password))
-            CUSTOMER: ((customer))
-            TIER: ((tier))
-            REGION: ((region))
+            <<: *concourse_connection_details
+            <<: *deployment_identifier
         - task: nuke-apps
           attempts: 1
           file: delivery-pop-automation/ci/tasks/pipeline-nuke-apps/task.yml
           image: delivery-ci-all-image
           params:
-            CF_USERNAME: ((cf_username))
-            CF_PASSWORD: ((cf_password))
-            CUSTOMER: ((customer))
-            REGION: ((region))
-            TIER: ((tier))
+            <<: *cf_connection_details
+            <<: *deployment_identifier
         - task: nuke-spaces
           attempts: 1
           file: delivery-pop-automation/ci/tasks/pipeline-nuke-spaces/task.yml
           image: delivery-ci-all-image
           params:
-            CF_USERNAME: ((cf_username))
-            CF_PASSWORD: ((cf_password))
-            CUSTOMER: ((customer))
-            REGION: ((region))
+            <<: *cf_connection_details
+            <<: *deployment_identifier
         - task: nuke-bosh-deployments
           attempts: 1
           file: delivery-pop-automation/ci/tasks/pipeline-nuke-bosh-deployments/task.yml
           image: delivery-ci-all-image
           params:
-            <<: *bosh_creds
+            <<: *bosh_connection_details
+            <<: *deployment_identifier
         - task: nuke-aws-services
           attempts: 1
           file: delivery-pop-automation/ci/tasks/pipeline-nuke-aws-services/task.yml
@@ -116,58 +120,51 @@ jobs:
           file: delivery-pop-automation/ci/tasks/pipeline-nuke-credhub-secrets/task.yml
           image: delivery-ci-all-image
           params:
-            <<: *credhub_params
-        - task: nuke-github-commits
-          attempts: 1
-          file: delivery-pop-automation/ci/tasks/pipeline-nuke-github-commits/task.yml
-          image: delivery-ci-all-image
-          params:
-            OKTA_OAUTH2_CLIENT_ID: ((okta_oauth2_client_id_tenants_api))
-            OKTA_OAUTH2_CLIENT_SECRET: ((okta_oauth2_client_secret_tenants_api))
-            GIT_PRIVATE_KEY: ((git-private-key))
-            CUSTOMER: ((customer))
-            REGION: ((region))
-            TIER: ((tier))
-            FLOW_TYPE: ((flow_type))
-            ENVIRONMENT_TYPE: ((environment_type))
-            TENANT_NAME: ((tenant_name))
+            <<: *credhub_connection_details
+            <<: *deployment_identifier
+        #DRY RUN
+        # - task: nuke-github-commits
+          # attempts: 1
+          # file: delivery-pop-automation/ci/tasks/pipeline-nuke-github-commits/task.yml
+          # image: delivery-ci-all-image
+          # params:
+          #   OKTA_OAUTH2_CLIENT_ID: ((okta_oauth2_client_id_tenants_api))
+          #   OKTA_OAUTH2_CLIENT_SECRET: ((okta_oauth2_client_secret_tenants_api))
+          #   GIT_PRIVATE_KEY: ((github_private_key))
+          #   FLOW_TYPE: mt_st_first
+          #   TENANT_NAME: msanity
+          #   <<: *deployment_identifier
         - task: nuke-slack-channel
           attempts: 1
           file: delivery-pop-automation/ci/tasks/pipeline-nuke-slack-channel/task.yml
           image: delivery-ci-all-image
           params:
             SLACK_EA_TENANTS_ADMIN_TOKEN: ((slack_ea_tenants_admin_token))
-            CUSTOMER: ((customer))
-      - task: nuke-trigger-file
-        attempts: 1
-        file: delivery-pop-automation/ci/tasks/pipeline-nuke-trigger-file/task.yml
-        image: delivery-ci-all-image
-        params:
-          GIT_PRIVATE_KEY: ((git-private-key))
-          CUSTOMER: ((customer))
-          REGION: ((region))
-          TIER: ((tier))
-      - task: nuke-tenant
-        attempts: 1
-        file: delivery-pop-automation/ci/tasks/pipeline-nuke-tenant/task.yml
-        image: delivery-ci-all-image
-        params:
-          OKTA_OAUTH2_CLIENT_ID: ((okta_oauth2_client_id_tenants_api))
-          OKTA_OAUTH2_CLIENT_SECRET: ((okta_oauth2_client_secret_tenants_api))
-          CUSTOMER: ((customer))
-          FLOW_TYPE: ((flow_type))
-          ENVIRONMENT_TYPE: ((environment_type))
-          TENANT_NAME: ((tenant_name))
+            <<: *deployment_identifier
+      # - task: nuke-trigger-file
+      #   attempts: 1
+      #   file: delivery-pop-automation/ci/tasks/pipeline-nuke-trigger-file/task.yml
+      #   image: delivery-ci-all-image
+      #   params:
+      #     GIT_PRIVATE_KEY: ((github_private_key))
+      #     <<: *deployment_identifier
+      # - task: nuke-tenant
+      #   attempts: 1
+      #   file: delivery-pop-automation/ci/tasks/pipeline-nuke-tenant/task.yml
+      #   image: delivery-ci-all-image
+      #   params:
+      #     OKTA_OAUTH2_CLIENT_ID: ((okta_oauth2_client_id_tenants_api))
+      #     OKTA_OAUTH2_CLIENT_SECRET: ((okta_oauth2_client_secret_tenants_api))
+      #     <<: *deployment_identifier
+      #     FLOW_TYPE: mt_st_first
+      #     TENANT_NAME: msanity
       - task: nuke-fleet-pipeline
         attempts: 1
         file: delivery-pop-automation/ci/tasks/nuke-fleet-pipeline/task.yml
         image: delivery-ci-all-image
         params:
-          CONCOURSE_USERNAME: admin
-          CONCOURSE_PASSWORD: ((app_concourse_admin_password))
-          CUSTOMER: ((customer))
-          TIER: ((tier))
-          REGION: ((region))
+          <<: *concourse_connection_details
+          <<: *deployment_identifier
 
     <<: *slack-alerts
 
@@ -183,7 +180,7 @@ resources:
   - name: slack-alert
     type: slack-notification
     source:
-      url: ((slack-webhook-url))
+      url: ((slack_webhook_url))
 
   - name: delivery-ci-all-image
     type: registry-image

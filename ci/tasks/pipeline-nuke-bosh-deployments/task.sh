@@ -14,14 +14,16 @@ bosh_customer_exists=$(bosh deps --column name | grep ${CUSTOMER}-${TIER} >>/dev
 if [ "$bosh_customer_exists" -eq 0 ];
 then
   echo -e ${GREEN}"Deleting Bosh deployments"${WHITE}
-  bosh deps --column name | grep "${CUSTOMER}-${TIER}-*" | awk '{print $1}' | xargs -I {} bosh -n -d {} delete-deployment
+  #DRY RUN
+  bosh deps --column name | grep "${CUSTOMER}-${TIER}-*" | awk '{print $1}' 
+  # bosh deps --column name | grep "${CUSTOMER}-${TIER}-*" | awk '{print $1}' | xargs -I {} bosh -n -d {} delete-deployment
 
   bosh_deps_deleted=$(bosh deps --column name | grep ${CUSTOMER}-${TIER} >>/dev/null 2>&1;echo $?)
   if [ "$bosh_deps_deleted" -eq 0 ];
   then
     echo -e ${GREEN}"List of deployments after delete"${WHITE}
     bosh deps --column name | grep ${CUSTOMER}-${TIER}
-    exit 1
+    exit 0 #DRY RUN 1->0
   else
     echo -e ${GREEN}"All bosh deployments deleted"${WHITE}
   fi

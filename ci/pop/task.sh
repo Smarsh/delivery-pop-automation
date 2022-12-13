@@ -19,7 +19,9 @@ WHITE="\e[0m"
 
 GH_REPO='delivery-pop-automation'
 
-export ENVIRONMENT_NAME="platform-delivery-${TIER}-${CLOUD}-${REGION}"
+export CLOUD_REGION=$(echo "$CLOUD_REGION" | tr '_' '-')
+
+export ENVIRONMENT_NAME="${CLOUD}-${REGION}-${CUSTOMER}-${TIER}"
 
 function update_repo(){
   if [ -n "$(git status --porcelain)" ]; then

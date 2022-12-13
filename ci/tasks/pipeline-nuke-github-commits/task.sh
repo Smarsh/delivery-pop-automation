@@ -118,10 +118,10 @@ try
 
     echo -e ${GREEN}"Revert template file"${WHITE}
 
-    file_exists=$(grep -n "${CUSTOMER}" ci/vars/validate_pr_template.yml >>/dev/null 2>&1;echo $?)
+    file_exists=$(grep -n "${CUSTOMER}-${TIER}" ci/vars/validate_pr_template.yml >>/dev/null 2>&1;echo $?)
     if [ "$file_exists" -eq 0 ];
     then
-      line=$(grep -n "${CUSTOMER}" ci/vars/validate_pr_template.yml | cut -d: -f1)
+      line=$(grep -n "${CUSTOMER}-${TIER}" ci/vars/validate_pr_template.yml | cut -d: -f1)
       echo -e ${GREEN}"Line: $line"${WHITE}
       if [ "$line" ]
       then
@@ -136,7 +136,7 @@ try
     if [ -n "$(git status --porcelain)" ];
     then
       git add .
-      git commit -m ":sparkler:	${CUSTOMER} - Reverted vars files"
+      git commit -m ":sparkler:	${CUSTOMER}-${TIER} - Reverted vars files"
       git push
     fi
   fi
@@ -159,19 +159,19 @@ try
   git config user.name "Concourse CI Bot"
   git config user.email "ci@localhost"
 
-  echo -e ${GREEN}"Revert enterprise archive and email gateway files for ${CUSTOMER}"${WHITE}
+  echo -e ${GREEN}"Revert enterprise archive and email gateway files for ${CUSTOMER}-${TIER}"${WHITE}
 
-  customer_exists=$(cat config/enterprise-archive/spaces.yml | grep "${CUSTOMER}" >>/dev/null 2>&1;echo $?)
+  customer_exists=$(cat config/enterprise-archive/spaces.yml | grep "${CUSTOMER}-${TIER}" >>/dev/null 2>&1;echo $?)
   echo -e ${GREEN}"Customer exists? ${customer_exists}"${WHITE}
 
   if [ "customer_exists" -eq 0 ];
   then
-    line=$(grep -n "${CUSTOMER}" config/enterprise-archive/spaces.yml | cut -d: -f1)
+    line=$(grep -n "${CUSTOMER}-${TIER}" config/enterprise-archive/spaces.yml | cut -d: -f1)
     echo -e ${GREEN}"Revert spaces file"${WHITE}
     sed -i "${line},${line}d" config/enterprise-archive/spaces.yml
 
     git add .
-    git commit -m ":sparkler:	${CUSTOMER} - Reverted all PCF Spaces"
+    git commit -m ":sparkler:	${CUSTOMER}-${TIER} - Reverted all PCF Spaces"
     git push
   fi
 
@@ -189,7 +189,7 @@ try
     echo -e ${GREEN}"Revert enterprise archive files"${WHITE}
     git rm config/enterprise-archive/${CUSTOMER}-${TIER} -r
     git add .
-    git commit -m ":sparkler:	${CUSTOMER} - Reverted enterprise archive files"
+    git commit -m ":sparkler:	${CUSTOMER}-${TIER} - Reverted enterprise archive files"
     git push
   fi
 
@@ -211,17 +211,17 @@ try
   git config user.name "Concourse CI Bot"
   git config user.email "ci@localhost"
 
-  echo -e ${GREEN}"Remove ${CUSTOMER} files"${WHITE}
-  find . -name '*${CUSTOMER}*' -exec git rm {} \;
+  echo -e ${GREEN}"Remove ${CUSTOMER}-${TIER} files"${WHITE}
+  find . -name '*${CUSTOMER}-${TIER}*' -exec git rm {} \;
 
-  echo -e ${GREEN}"Find ${CUSTOMER} line"${WHITE}
-  line_exists=$(grep -n "${CUSTOMER}" datadog/terraform-code/lag_drain_rate_dashboard_variable.tf >>/dev/null 2>&1;echo $?)
+  echo -e ${GREEN}"Find ${CUSTOMER}-${TIER} line"${WHITE}
+  line_exists=$(grep -n "${CUSTOMER}-${TIER}" datadog/terraform-code/lag_drain_rate_dashboard_variable.tf >>/dev/null 2>&1;echo $?)
   echo -e ${GREEN}"Line exists: $line_exists"${WHITE}
   if [ "$line_exists" -eq 0 ];
   then
     echo -e ${GREEN}"Getting line"${WHITE}
-    line=$(grep -n "${CUSTOMER}" datadog/terraform-code/lag_drain_rate_dashboard_variable.tf | cut -d: -f1 >>/dev/null 2>&1;echo $?)
-    echo -e ${GREEN}"Delete ${CUSTOMER} line"${WHITE}
+    line=$(grep -n "${CUSTOMER}-${TIER}" datadog/terraform-code/lag_drain_rate_dashboard_variable.tf | cut -d: -f1 >>/dev/null 2>&1;echo $?)
+    echo -e ${GREEN}"Delete ${CUSTOMER}-${TIER} line"${WHITE}
     sed -i "${line},${line}d" datadog/terraform-code/lag_drain_rate_dashboard_variable.tf
   fi
 
@@ -230,7 +230,7 @@ try
   then
     echo -e ${GREEN}"Commit to GitHub"${WHITE}
     git add .
-    git commit -m ":sparkler:	${CUSTOMER} - Revert deployment files"
+    git commit -m ":sparkler:	${CUSTOMER}-${TIER} - Revert deployment files"
     git push
   else
     echo -e ${GREEN}"Nothing to commit"${WHITE}
@@ -341,8 +341,8 @@ do
   cd ${repo}
   git checkout "${branch}"
 
-  DIRS=( $(find . -type d -name "*${CUSTOMER}*" ) )
-  FILES=( $(find . -type f -name "*${CUSTOMER}*" ) )
+  DIRS=( $(find . -type d -name "*${CUSTOMER}-${TIER}*" ) )
+  FILES=( $(find . -type f -name "*${CUSTOMER}-${TIER}*" ) )
 
 for i in "${DIRS[@]}"
 do
