@@ -27,6 +27,15 @@ then
   else
     echo -e ${GREEN}"All bosh deployments deleted"${WHITE}
   fi
+  bosh_deps_deleted=$(bosh deps --column name | grep ${CUSTOMER}-${SERVICE_REGION}-archive-${TIER} >>/dev/null 2>&1;echo $?)
+  if [ "$bosh_deps_deleted" -eq 0 ];
+  then
+    echo -e ${GREEN}"List of deployments after delete"${WHITE}
+    bosh deps --column name |  grep ${CUSTOMER}-${SERVICE_REGION}-archive-${TIER}
+    exit 0 #DRY RUN 1->0
+  else
+    echo -e ${GREEN}"All bosh deployments deleted"${WHITE}
+  fi
 else
   echo -e ${GREEN}"No Bosh deployments to delete"${WHITE}
 fi
