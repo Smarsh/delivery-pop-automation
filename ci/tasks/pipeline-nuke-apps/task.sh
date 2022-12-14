@@ -8,15 +8,16 @@ set -euo pipefail
 : "${CF_USERNAME:?CF_USERNAME env var must be provided}"
 : "${CF_PASSWORD:?CF_PASSWORD env var must be provided}"
 
+echo "Customer: ${CUSTOMER} Region: ${REGION} Tier: ${TIER}"
 
 
-cf login -a "api.sys.${REGION}.aws.smarsh.cloud" -u "${CF_USERNAME}" -p "${CF_PASSWORD}" -o platform -s platform-product-services
+cf login -a "api.sys.${REGION}.aws.smarsh.cloud" -o platform -s platform-product-services -u "${CF_USERNAME}" -p "${CF_PASSWORD}"
+
 #DRY RUN
-echo "${CUSTOMER}-${TIER}"
 # cf delete ehms-${CUSTOMER}-${TIER} -r -f
 # cf delete iss-${CUSTOMER}-${TIER} -r -f
 
-cf login -a "api.sys.${REGION}.aws.smarsh.cloud" -u "${CF_USERNAME}" -p "${CF_PASSWORD}" -o platform -s platform-data-services
+cf login -a "api.sys.${REGION}.aws.smarsh.cloud" -o platform -s platform-data-services -u "${CF_USERNAME}" -p "${CF_PASSWORD}"
 
 status=$(cf apps | tail +4 | cut -d ' ' -f 1 | grep "${CUSTOMER}-${TIER}" >/dev/null 2>&1;echo $?)
 
