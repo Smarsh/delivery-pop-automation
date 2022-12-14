@@ -22,7 +22,7 @@ cd terraform_workspace
 terraform init -reconfigure
 aws rds modify-db-instance --db-instance-identifier eadb-uaa-postgres-${CUSTOMER}-${TIER} --region ${CLOUD_REGION} --no-deletion-protection --apply-immediately > output.txt
 terraform plan -destroy
-terraform apply -destroy -auto-approve
+# terraform apply -destroy -auto-approve
 cd ../
 
 ##TPS Deletion
@@ -35,7 +35,7 @@ cd terraform_workspace
 terraform init -reconfigure
 aws rds modify-db-instance --db-instance-identifier eadb-egw-tps-postgres-tpspostgres-${CUSTOMER}-${TIER} --region ${CLOUD_REGION} --no-deletion-protection --apply-immediately > output.txt
 terraform plan -destroy
-terraform apply -destroy -auto-approve
+# terraform apply -destroy -auto-approve
 cd ../
 
 
