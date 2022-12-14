@@ -135,13 +135,13 @@ jobs:
           #   FLOW_TYPE: mt_st_first
           #   TENANT_NAME: msanity
           #   <<: *deployment_identifier
-        - task: nuke-slack-channel
-          attempts: 1
-          file: delivery-pop-automation/ci/tasks/pipeline-nuke-slack-channel/task.yml
-          image: delivery-ci-all-image
-          params:
-            SLACK_EA_TENANTS_ADMIN_TOKEN: ((slack_ea_tenants_admin_token))
-            <<: *deployment_identifier
+        # - task: nuke-slack-channel
+        #   attempts: 1
+        #   file: delivery-pop-automation/ci/tasks/pipeline-nuke-slack-channel/task.yml
+        #   image: delivery-ci-all-image
+        #   params:
+        #     SLACK_EA_TENANTS_ADMIN_TOKEN: ((slack_ea_tenants_admin_token))
+        #     <<: *deployment_identifier
       # - task: nuke-trigger-file
       #   attempts: 1
       #   file: delivery-pop-automation/ci/tasks/pipeline-nuke-trigger-file/task.yml

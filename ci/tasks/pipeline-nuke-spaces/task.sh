@@ -5,6 +5,8 @@ set -euo pipefail
 : "${REGION:?REGION env var must be provided}"
 : "${CUSTOMER:?CUSTOMER env var must be provided}"
 : "${TIER:?TIER env var must be provided}"
+: "${CF_USERNAME:?CF_USERNAME env var must be provided}"
+: "${CF_PASSWORD:?CF_PASSWORD env var must be provided}"
 
 # Set colours
 GREEN="\e[32m"
@@ -34,7 +36,7 @@ function delete_customer_space(){
 
 }
 
-cf login -a api.sys.${REGION}.aws.smarsh.cloud -u ${CF_USERNAME} -p ${CF_PASSWORD} -o platform -s platform-product-services
+cf login -a "api.sys.${REGION}.aws.smarsh.cloud" -u "${CF_USERNAME}" -p "${CF_PASSWORD}" -o platform -s platform-product-services
 echo -e ${GREEN}"Target enterprise archive org"${WHITE}
 delete_customer_space enterprise-archive
 echo -e ${GREEN}"Target email-gateway org"${WHITE}
