@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euox pipefail
+set -euo pipefail
 
 : "${CUSTOMER:?CUSTOMER env var must be provided}"
 : "${TIER:?TIER env var must be provided}"
