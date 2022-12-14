@@ -11,4 +11,4 @@ fly --target ${REGION}-enterprise-archive login -n enterprise-archive -c https:/
 
 #Deleting Pipeline
 echo "ea-${CUSTOMER}-${TIER}"
-#DRY-RUN fly --target ${REGION}-enterprise-archive dp -p ea-${CUSTOMER}-${TIER} -n
+fly --target ${REGION}-enterprise-archive dp -p ea-${CUSTOMER}-${TIER} -n

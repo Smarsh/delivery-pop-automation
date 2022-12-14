@@ -26,7 +26,7 @@ then
   then
     echo -e ${GREEN}"List of deployments after delete"${WHITE}
     bosh deps --column name | grep -E  "${CUSTOMER}-${TIER}|${CUSTOMER}-${SERVICE_REGION}-archive-${TIER}"
-    exit 0 #DRY RUN 1->0
+    exit 1
   else
     echo -e ${GREEN}"All bosh deployments deleted"${WHITE}
   fi

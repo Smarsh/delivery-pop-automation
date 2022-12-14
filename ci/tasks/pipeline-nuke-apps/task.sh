@@ -14,9 +14,8 @@ echo "Customer: ${CUSTOMER} Region: ${REGION} Service Region: ${SERVICE_REGION} 
 
 cf login -a api.sys.${REGION}.aws.smarsh.cloud -u ${CF_USERNAME} -p "\"${CF_PASSWORD}\"" -o platform -s platform-product-services
 
-#DRY RUN
-# cf delete ehms-${CUSTOMER}-${TIER} -r -f
-# cf delete iss-${CUSTOMER}-${TIER} -r -f
+cf delete ehms-${CUSTOMER}-${TIER} -r -f
+cf delete iss-${CUSTOMER}-${TIER} -r -f
 
 cf login -a api.sys.${REGION}.aws.smarsh.cloud -u ${CF_USERNAME} -p "\"${CF_PASSWORD}\"" -o platform -s platform-data-services
 
@@ -24,7 +23,5 @@ cf login -a api.sys.${REGION}.aws.smarsh.cloud -u ${CF_USERNAME} -p "\"${CF_PASS
 status=$(cf apps | tail +4 | cut -d ' ' -f 1 | grep "${CUSTOMER}-${SERVICE_REGION}-archive-${TIER}" >/dev/null 2>&1;echo $?)
 
 if [[ $status -eq 0 ]]; then
-    # cf apps | tail +4 | cut -d ' ' -f 1 | grep "${CUSTOMER}-${TIER}"
-    cf apps | tail +4 | cut -d ' ' -f 1 | grep "${CUSTOMER}-${SERVICE_REGION}-archive-${TIER}"
-    # cf apps | tail +4 | cut -d ' ' -f 1 | grep "${CUSTOMER}-${TIER}" | xargs -r -n 1 cf delete -f
+    cf apps | tail +4 | cut -d ' ' -f 1 | grep "${CUSTOMER}-${SERVICE_REGION}-archive-${TIER}" | xargs -r -n 1 cf delete -f
 fi
