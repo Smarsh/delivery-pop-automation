@@ -13,11 +13,23 @@ set -euo pipefail
 
 source delivery-tenants-api/ci/tasks/pipeline-nuke-github-commits/trycatch.sh
 
+
+
 # Set colours
 GREEN="\e[32m"
 RED="\e[41m\e[37m\e[1m"
 YELLOW="\e[33m"
 WHITE="\e[0m"
+
+if [ "$TIER" = "production" ]; then
+    export ENVIRONMENT_TYPE='prod'
+else
+    export ENVIRONMENT_TYPE="${TIER}"
+fi
+
+export API_REGION=$(echo "${REGION^^}" | tr '-' '_')
+
+
 
 echo -e ${GREEN}"___"${WHITE}
 echo -e ${GREEN}"Get auth token"${WHITE}
@@ -43,9 +55,9 @@ echo -e ${GREEN}"___"${WHITE}
 echo -e ${GREEN}"Find tenant"${WHITE}
 echo -e ${GREEN}"___"${WHITE}
 
-http_code=$(curl -LI --location --request GET "${API_URL}/tenants?page=0&size=1&customer-name=${CUSTOMER}&region=${REGION}&environment-type=${TIER}&flow-type=${FLOW_TYPE}&tenant-name=${TENANT_NAME}" -o /dev/null --header 'Content-Type: application/json' --header 'Accept: application/json' --header "Authorization: Bearer $AUTH_TOKEN" -w '%{http_code}\n' -s)
+http_code=$(curl -LI --location --request GET "${API_URL}/tenants?page=0&size=1&customer-name=${CUSTOMER}&region=${API_REGION}&environment-type=${ENVIRONMENT_TYPE}&flow-type=${FLOW_TYPE}&tenant-name=${TENANT_NAME}" -o /dev/null --header 'Content-Type: application/json' --header 'Accept: application/json' --header "Authorization: Bearer $AUTH_TOKEN" -w '%{http_code}\n' -s)
 if [ ${http_code} -eq 200 ]; then
-    TENANT_ID=$(curl --location --request GET "${API_URL}/tenants?page=0&size=1&customer-name=${CUSTOMER}&region=${REGION}&environment-type=${TIER}&flow-type=${FLOW_TYPE}&tenant-name=${TENANT_NAME}" \
+    TENANT_ID=$(curl --location --request GET "${API_URL}/tenants?page=0&size=1&customer-name=${CUSTOMER}&region=${API_REGION}&environment-type=${ENVIRONMENT_TYPE}&flow-type=${FLOW_TYPE}&tenant-name=${TENANT_NAME}" \
       --header 'Content-Type: application/json' \
       --header 'Accept: application/json' \
       --header "Authorization: Bearer $AUTH_TOKEN" | jq '.[0].id')

@@ -24,7 +24,7 @@ jq . channel.json
 channel_id=$(cat channel.json | jq -r '.conversations[0].id')
 channel_name=$(cat channel.json | jq -r '.conversations[0].name')
 
-if [ "$channel_name" = "CUSTOMER_CHANNEL_NAME" ]; then
+if [ "$channel_name" = "$CUSTOMER_CHANNEL_NAME" ]; then
     curl --location --request POST "https://slack.com/api/admin.conversations.delete?channel_id=${channel_id}" \
     --header "Authorization: Bearer $SLACK_EA_TENANTS_ADMIN_TOKEN"
 else
