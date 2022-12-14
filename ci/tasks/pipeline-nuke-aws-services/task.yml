@@ -1,0 +1,13 @@
+---
+platform: linux
+
+inputs:
+  - name: delivery-pop-automation
+
+run:
+  path: delivery-pop-automation/ci/tasks/pipeline-nuke-aws-terraform-services/task.sh
+
+params:
+  CUSTOMER:
+  TIER:
+  REGION:

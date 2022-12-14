@@ -3,3 +3,4 @@ customer: poplite
 tier: production
 region: us-west-2
 service_region: nam
+region_bucket_suffix: uswest2

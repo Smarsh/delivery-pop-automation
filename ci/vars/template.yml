@@ -3,3 +3,4 @@ customer: ${CUSTOMER}
 tier: ${TIER}
 region: ${REGION}
 service_region: ${SERVICE_REGION}
+region_bucket_suffix: ${REGION_BUCKET_SUFFIX}
