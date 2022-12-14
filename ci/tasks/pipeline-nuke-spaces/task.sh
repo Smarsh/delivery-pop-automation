@@ -36,7 +36,7 @@ function delete_customer_space(){
 
 }
 
-cf login -a "api.sys.${REGION}.aws.smarsh.cloud" -u "${CF_USERNAME}" -p "${CF_PASSWORD}" -o platform -s platform-product-services
+echo ${CF_PASSWORD} | cf login -a "api.sys.${REGION}.aws.smarsh.cloud" -o platform -s platform-delivery-services -u ${CF_USERNAME}
 echo -e ${GREEN}"Target enterprise archive org"${WHITE}
 delete_customer_space enterprise-archive
 echo -e ${GREEN}"Target email-gateway org"${WHITE}
