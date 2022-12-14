@@ -116,6 +116,8 @@ jobs:
             REGION: ((region))
             TIER: ((tier))
             REGION_BUCKET_SUFFIX: ((region_bucket_suffix))
+            AWS_ACCESS_KEY_ID: ((ea_iam_access_key_id))
+            AWS_SECRET_ACCESS_KEY: ((ea_iam_secret_access_key))
         - task: nuke-credhub-secrets
           attempts: 1
           file: delivery-pop-automation/ci/tasks/pipeline-nuke-credhub-secrets/task.yml

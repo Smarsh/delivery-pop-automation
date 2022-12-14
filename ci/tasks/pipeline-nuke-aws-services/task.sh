@@ -3,6 +3,8 @@
 set -euo pipefail
 : "${CUSTOMER:?CUSTOMER env var must be provided}"
 : "${TIER:?TIER env var must be provided}"
+: "${AWS_ACCESS_KEY_ID:?AWS_ACCESS_KEY_ID env var must be provided}"
+: "${AWS_SECRET_ACCESS_KEY:?AWS_SECRET_ACCESS_KEY env var must be provided}"
 
 # Set colours
 GREEN="\e[32m"
