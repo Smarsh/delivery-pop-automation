@@ -11,7 +11,7 @@ set -euo pipefail
 echo "Customer: ${CUSTOMER} Region: ${REGION} Tier: ${TIER}"
 
 
-cf login -a "api.sys.${REGION}.aws.smarsh.cloud" -o platform -s platform-product-services -u "${CF_USERNAME}" -p "${CF_PASSWORD}"
+echo ${CF_PASSWORD} | cf login -a "api.sys.${REGION}.aws.smarsh.cloud" -o platform -s platform-delivery-services -u ${CF_USERNAME}
 
 #DRY RUN
 # cf delete ehms-${CUSTOMER}-${TIER} -r -f
