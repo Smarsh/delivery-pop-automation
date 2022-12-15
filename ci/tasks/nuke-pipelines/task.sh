@@ -20,6 +20,7 @@ fly --target ${REGION}-enterprise-archive dp -p ea-create-app-tenant-${CUSTOMER}
 fly --target ${REGION}-enterprise-archive dp -p ea-zookeeper-${CUSTOMER}-${TIER} -n
 fly --target ${REGION}-enterprise-archive dp -p ea-e2e-sanity-${CUSTOMER}-${TIER} -n
 fly --target ${REGION}-enterprise-archive dp -p ea-create-app-tenant-${CUSTOMER}-${TIER} -n
+fly --target ${REGION}-enterprise-archive dp -p ea-${CUSTOMER}-${TIER} -n
 
 fly --target ${REGION}-platform-product-services login -b -n platform-product-services -c https://app-concourse.${REGION}.aws.smarsh.cloud -u $CONCOURSE_USERNAME -p $CONCOURSE_PASSWORD
 fly --target ${REGION}-platform-product-services dp -p ehms-${CUSTOMER}-${TIER} -n

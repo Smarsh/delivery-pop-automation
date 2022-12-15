@@ -161,13 +161,6 @@ jobs:
       #     <<: *deployment_identifier
       #     FLOW_TYPE: mt_st_first
       #     TENANT_NAME: msanity
-      - task: nuke-fleet-pipeline
-        attempts: 1
-        file: delivery-pop-automation/ci/tasks/nuke-fleet-pipeline/task.yml
-        image: delivery-ci-all-image
-        params:
-          <<: *concourse_connection_details
-          <<: *deployment_identifier
 
     <<: *slack-alerts
 
