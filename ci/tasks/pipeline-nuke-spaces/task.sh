@@ -24,7 +24,7 @@ function delete_customer_space(){
   then
     echo -e ${GREEN}"Change target"${WHITE}
     cf target -o ${ORG} -s ${CUSTOMER}-${TIER}
-
+    cf apps | awk '{print $1}' | xargs -I {} cf delete {} -r -f
     echo -e ${GREEN}"Delete space ${CUSTOMER}-${TIER}"${WHITE}
     space_deleted=$(cf delete-space ${CUSTOMER}-${TIER} -f >>/dev/null 2>&1;echo $?)
     while [ "$space_deleted" -ne 0 ]

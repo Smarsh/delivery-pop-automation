@@ -23,5 +23,5 @@ cf login -a api.sys.${REGION}.aws.smarsh.cloud -u ${CF_USERNAME} -p "\"${CF_PASS
 status=$(cf apps | tail +4 | cut -d ' ' -f 1 | grep "${CUSTOMER}-${SERVICE_REGION}-archive-${TIER}" >/dev/null 2>&1;echo $?)
 
 if [[ $status -eq 0 ]]; then
-    cf apps | tail +4 | cut -d ' ' -f 1 | grep "${CUSTOMER}-${SERVICE_REGION}-archive-${TIER}" | xargs -r -n 1 cf delete -f
+    cf apps | tail +4 | cut -d ' ' -f 1 | grep "${CUSTOMER}-${SERVICE_REGION}-archive-${TIER}" | xargs -r -n 1 cf delete -f -r
 fi
