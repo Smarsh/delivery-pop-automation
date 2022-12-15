@@ -1,0 +1,16 @@
+---
+platform: linux
+
+inputs:
+- name: delivery-pop-automation
+
+run:
+  path: /bin/bash
+  args: ["delivery-pop-automation/ci/tasks/nuke-s3-bucket/task.sh"]
+
+params:
+  aws_secret_access_key:
+  aws_access_key_id:
+  object_prefix:
+  tenant_name:
+  region:
