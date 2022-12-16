@@ -4,7 +4,7 @@ This Repository has been created to further promote stability with PoPlite.
 
 PoPLite is used as a gate that generates clean PoP Workflow Runs.
 
-## Tasks in delivery-pop-automation: 
+## Tasks in delivery-pop-automation
 
 Both tasks `create-pop-release` and `create-pop-release-candidate` have been created to prevent the following issues: 
 1) Not being able to read versions from the master branch due to the qualified branch not being successful L->R in a previous environment. 
