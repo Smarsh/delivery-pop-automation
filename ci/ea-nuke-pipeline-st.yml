@@ -1,0 +1,197 @@
+---
+meta:
+  slack-alerts: &slack-alerts
+    on_error:
+      put: slack-alert
+      params:
+        channel: bot-test
+        silent: true
+        text: |
+          *ERROR:* `$BUILD_PIPELINE_NAME` has encountered an error \
+          in job `$BUILD_JOB_NAME`.
+          You can view the output here: $ATC_EXTERNAL_URL/builds/$BUILD_ID
+        icon_emoji: ":warning:"
+    on_failure:
+      put: slack-alert
+      params:
+        channel: bot-test
+        silent: true
+        text: |
+          *FAILURE:* `$BUILD_PIPELINE_NAME` has encountered a failure \
+          in job `$BUILD_JOB_NAME`.
+          You can view the output here: $ATC_EXTERNAL_URL/builds/$BUILD_ID
+        icon_emoji: ":exclamation:"
+
+anchors:
+
+  <<: &bosh_connection_details
+    BOSH_CA_CERT: |
+      ((bosh_sidecar_ca_cert))
+    BOSH_CLIENT: ((bosh_sidecar_client))
+    BOSH_CLIENT_SECRET: ((bosh_sidecar_client_secret))
+    BOSH_ENVIRONMENT: ((bosh_sidecar_environment))
+
+  <<: &credhub_connection_details
+    CREDHUB_CLIENT: ((credhub_client))
+    CREDHUB_SECRET: ((credhub_secret))
+    CREDHUB_SERVER: ((credhub_server))
+
+  <<: &concourse_connection_details
+    CONCOURSE_USERNAME: ci-delivery
+    CONCOURSE_PASSWORD: ((app_concourse_password))
+
+  <<: &cf_connection_details
+    CF_USERNAME: ((cf_username))
+    CF_PASSWORD: ((cf_password))
+
+  <<: &deployment_identifier
+    CUSTOMER: ((customer))
+    REGION: ((region))
+    SERVICE_REGION: ((service_region))
+    TIER: ((tier))
+
+groups:
+
+  - name: all
+    jobs:
+      - set-pipeline
+      - nuke-all
+
+jobs:
+
+  - name: set-pipeline
+    serial: true
+    plan:
+      - in_parallel:
+        - get: delivery-pop-automation
+          trigger: true
+      - set_pipeline: ea-nuke-pipeline-((customer))-((tier))
+        file: delivery-pop-automation/ci/ea-nuke-pipeline-st.yml
+        var_files:
+          - delivery-pop-automation/ci/vars/((cloud))-((region))-((customer))-((tier)).yml
+
+  - name: nuke-all
+    serial: true
+    plan:
+      - in_parallel:
+        - get: delivery-pop-automation
+          passed: [ set-pipeline ]
+        - get: delivery-ci-all-image
+        - get: delivery-ci-terraform-image
+      - in_parallel:
+        - task: nuke-pipelines
+          attempts: 1
+          file: delivery-pop-automation/ci/tasks/nuke-pipelines/task.yml
+          image: delivery-ci-all-image
+          params:
+            <<: *concourse_connection_details
+            <<: *deployment_identifier
+        - task: nuke-apps
+          attempts: 1
+          file: delivery-pop-automation/ci/tasks/pipeline-nuke-apps/task.yml
+          image: delivery-ci-all-image
+          params:
+            <<: *cf_connection_details
+            <<: *deployment_identifier
+        - task: nuke-spaces
+          attempts: 1
+          file: delivery-pop-automation/ci/tasks/pipeline-nuke-spaces/task.yml
+          image: delivery-ci-all-image
+          params:
+            <<: *cf_connection_details
+            <<: *deployment_identifier
+        - task: nuke-bosh-deployments
+          attempts: 1
+          file: delivery-pop-automation/ci/tasks/pipeline-nuke-bosh-deployments/task.yml
+          image: delivery-ci-all-image
+          params:
+            <<: *bosh_connection_details
+            <<: *deployment_identifier
+        - task: nuke-aws-services
+          attempts: 1
+          file: delivery-pop-automation/ci/tasks/pipeline-nuke-aws-services/task.yml
+          image: delivery-ci-terraform-image
+          params:
+            CUSTOMER: ((customer))
+            REGION: ((region))
+            TIER: ((tier))
+            REGION_BUCKET_SUFFIX: ((region_bucket_suffix))
+            AWS_ACCESS_KEY_ID: ((ea_iam_access_key_id))
+            AWS_SECRET_ACCESS_KEY: ((ea_iam_secret_access_key))
+        - task: nuke-credhub-secrets
+          attempts: 1
+          file: delivery-pop-automation/ci/tasks/pipeline-nuke-credhub-secrets/task.yml
+          image: delivery-ci-all-image
+          params:
+            <<: *credhub_connection_details
+            <<: *deployment_identifier
+        #DRY RUN
+        # - task: nuke-github-commits
+          # attempts: 1
+          # file: delivery-pop-automation/ci/tasks/pipeline-nuke-github-commits/task.yml
+          # image: delivery-ci-all-image
+          # params:
+          #   OKTA_OAUTH2_CLIENT_ID: ((okta_oauth2_client_id_tenants_api))
+          #   OKTA_OAUTH2_CLIENT_SECRET: ((okta_oauth2_client_secret_tenants_api))
+          #   GIT_PRIVATE_KEY: ((github_private_key))
+          #   FLOW_TYPE: mt_st_first
+          #   TENANT_NAME: msanity
+          #   <<: *deployment_identifier
+        # - task: nuke-slack-channel
+        #   attempts: 1
+        #   file: delivery-pop-automation/ci/tasks/pipeline-nuke-slack-channel/task.yml
+        #   image: delivery-ci-all-image
+        #   params:
+        #     SLACK_EA_TENANTS_ADMIN_TOKEN: ((slack_ea_tenants_admin_token))
+        #     <<: *deployment_identifier
+      # - task: nuke-trigger-file
+      #   attempts: 1
+      #   file: delivery-pop-automation/ci/tasks/pipeline-nuke-trigger-file/task.yml
+      #   image: delivery-ci-all-image
+      #   params:
+      #     GIT_PRIVATE_KEY: ((github_private_key))
+      #     <<: *deployment_identifier
+      # - task: nuke-tenant
+      #   attempts: 1
+      #   file: delivery-pop-automation/ci/tasks/pipeline-nuke-tenant/task.yml
+      #   image: delivery-ci-all-image
+      #   params:
+      #     OKTA_OAUTH2_CLIENT_ID: ((okta_oauth2_client_id_tenants_api))
+      #     OKTA_OAUTH2_CLIENT_SECRET: ((okta_oauth2_client_secret_tenants_api))
+      #     <<: *deployment_identifier
+      #     FLOW_TYPE: mt_st_first
+      #     TENANT_NAME: msanity
+
+    <<: *slack-alerts
+
+resources:
+
+  - name: delivery-pop-automation
+    type: git
+    source:
+      private_key: ((github_private_key))
+      uri: git@github.com:Smarsh/delivery-pop-automation.git
+      branch: master
+
+  - name: slack-alert
+    type: slack-notification
+    source:
+      url: ((slack_webhook_url))
+
+  - name: delivery-ci-all-image
+    type: registry-image
+    source:
+      repository: smarshops/delivery-ci-all
+
+  - name: delivery-ci-terraform-image
+    type: registry-image
+    source:
+      repository: smarshops/delivery-ci-terraform
+
+resource_types:
+
+  - name: slack-notification
+    type: registry-image
+    source:
+      repository: cfcommunity/slack-notification-resource
+      tag: latest

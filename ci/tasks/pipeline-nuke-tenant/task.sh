@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+: "${OKTA_OAUTH2_CLIENT_ID:?OKTA_OAUTH2_CLIENT_ID env var must be provided}"
+: "${OKTA_OAUTH2_CLIENT_SECRET:?OKTA_OAUTH2_CLIENT_SECRET env var must be provided}"
+: "${REGION:?REGION env var must be provided}"
+: "${CUSTOMER:?CUSTOMER env var must be provided}"
+: "${FLOW_TYPE:?FLOW_TYPE env var must be provided}"
+: "${TIER:?TIER env var must be provided}"
+: "${TENANT_NAME:?TENANT_NAME env var must be provided}"
 
 # Set colours
 GREEN="\e[32m"
@@ -32,9 +39,9 @@ echo -e ${GREEN}"___"${WHITE}
 echo -e ${GREEN}"Find tenant"${WHITE}
 echo -e ${GREEN}"___"${WHITE}
 
-http_code=$(curl -LI --location --request GET "${API_URL}/tenants?page=0&size=1&customer-name=poplite" -o /dev/null --header 'Content-Type: application/json' --header 'Accept: application/json' --header "Authorization: Bearer $AUTH_TOKEN" -w '%{http_code}\n' -s)
+http_code=$(curl -LI --location --request GET "${API_URL}/tenants?page=0&size=1&customer-name=${CUSTOMER}&region=${REGION}&environment-type=${TIER}&flow-type=${FLOW_TYPE}&tenant-name=${TENANT_NAME}" -o /dev/null --header 'Content-Type: application/json' --header 'Accept: application/json' --header "Authorization: Bearer $AUTH_TOKEN" -w '%{http_code}\n' -s)
 if [ ${http_code} -eq 200 ]; then
-    TENANT_ID=$(curl --location --request GET "${API_URL}/tenants?page=0&size=1&customer-name=poplite" \
+    TENANT_ID=$(curl --location --request GET "${API_URL}/tenants?page=0&size=1&customer-name=${CUSTOMER}&region=${REGION}&environment-type=${TIER}&flow-type=${FLOW_TYPE}&tenant-name=${TENANT_NAME}" \
       --header 'Content-Type: application/json' \
       --header 'Accept: application/json' \
       --header "Authorization: Bearer $AUTH_TOKEN" | jq '.[0].id')

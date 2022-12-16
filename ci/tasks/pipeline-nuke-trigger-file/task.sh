@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+: "${REGION:?REGION env var must be provided}"
+: "${CUSTOMER:?CUSTOMER env var must be provided}"
+: "${GIT_PRIVATE_KEY:?GIT_PRIVATE_KEY env var must be provided}"
+: "${TIER:?TIER env var must be provided}"
 
-source delivery-tenants-api/ci/tasks/poplite-nuke-trigger-file/trycatch.sh
+source delivery-tenants-api/ci/tasks/pipeline-nuke-trigger-file/trycatch.sh
 
 # Set colours
 GREEN="\e[32m"
@@ -41,16 +45,16 @@ try
   git config user.name "Concourse CI Bot"
   git config user.email "ci@localhost"
 
-  triggerfileexists=$(find . -name 'trigger-aws-us-west-2-poplite-production')
+  triggerfileexists=$(find . -name "trigger-${CLOUD}-${REGION}-${CUSTOMER}-${TIER}")
   if [ "$triggerfileexists" ]
   then
     echo -e ${GREEN}"Deleting trigger file"${WHITE}
-    find . -name 'trigger-aws-us-west-2-poplite-production' -exec git rm {} \;
+    find . -name "trigger-${CLOUD}-${REGION}-${CUSTOMER}-${TIER}" -exec git rm {} \;
 
     if [ -n "$(git status --porcelain)" ];
     then
       git add .
-      git commit -m ":sparkler:	PoPlite - Deleted trigger file"
+      git commit -m ":sparkler:	Pipeline - Deleted trigger file"
       git push
     fi
   else

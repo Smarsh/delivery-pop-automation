@@ -1,0 +1,16 @@
+---
+platform: linux
+image_resource:
+  type: registry-image
+  source:
+    repository: smarshops/delivery-ci-fly
+    username: ((docker_hub_username))
+    password: ((docker_hub_password))
+
+inputs:
+  - name: repo
+  - name: pop-input
+
+run:
+  path: bash
+  args: ["repo/ci/pop/task.sh"]

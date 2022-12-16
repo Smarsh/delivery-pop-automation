@@ -1,8 +1,19 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+: "${OKTA_OAUTH2_CLIENT_ID:?OKTA_OAUTH2_CLIENT_ID env var must be provided}"
+: "${OKTA_OAUTH2_CLIENT_SECRET:?OKTA_OAUTH2_CLIENT_SECRET env var must be provided}"
+: "${GIT_PRIVATE_KEY:?GIT_PRIVATE_KEY env var must be provided}"
+: "${CUSTOMER:?CUSTOMER env var must be provided}"
+: "${TIER:?TIER env var must be provided}"
+: "${REGION:?REGION env var must be provided}"
+: "${FLOW_TYPE:?FLOW_TYPE env var must be provided}"
+: "${TENANT_NAME:?TENANT_NAME env var must be provided}"
 
-source delivery-tenants-api/ci/tasks/poplite-nuke-github-commits/trycatch.sh
+
+source delivery-tenants-api/ci/tasks/pipeline-nuke-github-commits/trycatch.sh
+
+
 
 # Set colours
 GREEN="\e[32m"
@@ -10,7 +21,15 @@ RED="\e[41m\e[37m\e[1m"
 YELLOW="\e[33m"
 WHITE="\e[0m"
 
-region=us-west-2
+if [ "$TIER" = "production" ]; then
+    export ENVIRONMENT_TYPE='prod'
+else
+    export ENVIRONMENT_TYPE="${TIER}"
+fi
+
+export API_REGION=$(echo "${REGION^^}" | tr '-' '_')
+
+
 
 echo -e ${GREEN}"___"${WHITE}
 echo -e ${GREEN}"Get auth token"${WHITE}
@@ -36,9 +55,9 @@ echo -e ${GREEN}"___"${WHITE}
 echo -e ${GREEN}"Find tenant"${WHITE}
 echo -e ${GREEN}"___"${WHITE}
 
-http_code=$(curl -LI --location --request GET "${API_URL}/tenants?page=0&size=1&customer-name=poplite" -o /dev/null --header 'Content-Type: application/json' --header 'Accept: application/json' --header "Authorization: Bearer $AUTH_TOKEN" -w '%{http_code}\n' -s)
+http_code=$(curl -LI --location --request GET "${API_URL}/tenants?page=0&size=1&customer-name=${CUSTOMER}&region=${API_REGION}&environment-type=${ENVIRONMENT_TYPE}&flow-type=${FLOW_TYPE}&tenant-name=${TENANT_NAME}" -o /dev/null --header 'Content-Type: application/json' --header 'Accept: application/json' --header "Authorization: Bearer $AUTH_TOKEN" -w '%{http_code}\n' -s)
 if [ ${http_code} -eq 200 ]; then
-    TENANT_ID=$(curl --location --request GET "${API_URL}/tenants?page=0&size=1&customer-name=poplite" \
+    TENANT_ID=$(curl --location --request GET "${API_URL}/tenants?page=0&size=1&customer-name=${CUSTOMER}&region=${API_REGION}&environment-type=${ENVIRONMENT_TYPE}&flow-type=${FLOW_TYPE}&tenant-name=${TENANT_NAME}" \
       --header 'Content-Type: application/json' \
       --header 'Accept: application/json' \
       --header "Authorization: Bearer $AUTH_TOKEN" | jq '.[0].id')
@@ -81,11 +100,10 @@ try
   git clone "git@github.com:Smarsh/delivery-ea-versions.git"
   pushd delivery-ea-versions
 
-  delete=$(git push -d origin aws-us-west-2-poplite-production >>/dev/null 2>&1;echo $?)
-  delete=$(git branch -d aws-us-west-2-poplite-production >>/dev/null 2>&1;echo $?)
+  delete=$(git push -d origin "${CLOUD}-${REGION}-${CUSTOMER}-${TIER}" >>/dev/null 2>&1;echo $?)
+  delete=$(git branch -d "${CLOUD}-${REGION}-${CUSTOMER}-${TIER}" >>/dev/null 2>&1;echo $?)
 
   popd
-  rm -rf delivery-ea-versions
   echo -e ${GREEN}"Finished reverting delivery-ea-versions"${WHITE}
 )
 catch || {
@@ -105,17 +123,17 @@ try
 
   echo -e ${GREEN}"Revert vars files"${WHITE}
 
-  varsexist=$(find . -name '*aws-us-west-2-poplite-production*')
+  varsexist=$(find . -name "*${CLOUD}-${REGION}-${CUSTOMER}-${TIER}*")
   if [ "$varsexist" ]
   then
-    find . -name '*aws-us-west-2-poplite-production*' -exec git rm {} \;
+    find . -name "*${CLOUD}-${REGION}-${CUSTOMER}-${TIER}*" -exec git rm {} \;
 
     echo -e ${GREEN}"Revert template file"${WHITE}
 
-    file_exists=$(grep -n "poplite" ci/vars/validate_pr_template.yml >>/dev/null 2>&1;echo $?)
+    file_exists=$(grep -n "${CUSTOMER}-${TIER}" ci/vars/validate_pr_template.yml >>/dev/null 2>&1;echo $?)
     if [ "$file_exists" -eq 0 ];
     then
-      line=$(grep -n "poplite" ci/vars/validate_pr_template.yml | cut -d: -f1)
+      line=$(grep -n "${CUSTOMER}-${TIER}" ci/vars/validate_pr_template.yml | cut -d: -f1)
       echo -e ${GREEN}"Line: $line"${WHITE}
       if [ "$line" ]
       then
@@ -130,13 +148,12 @@ try
     if [ -n "$(git status --porcelain)" ];
     then
       git add .
-      git commit -m ":sparkler:	PoPlite - Reverted vars files"
+      git commit -m ":sparkler:	${CUSTOMER}-${TIER} - Reverted vars files"
       git push
     fi
   fi
 
   popd
-  rm -rf delivery-aws-pipelines
   echo -e ${GREEN}"Finished reverting delivery-aws-pipelines"${WHITE}
 )
 catch || {
@@ -154,19 +171,19 @@ try
   git config user.name "Concourse CI Bot"
   git config user.email "ci@localhost"
 
-  echo -e ${GREEN}"Revert enterprise archive and email gateway files for poplite"${WHITE}
+  echo -e ${GREEN}"Revert enterprise archive and email gateway files for ${CUSTOMER}-${TIER}"${WHITE}
 
-  poplite_exists=$(cat config/enterprise-archive/spaces.yml | grep "poplite" >>/dev/null 2>&1;echo $?)
-  echo -e ${GREEN}"Poplite exists? ${poplite_exists}"${WHITE}
+  customer_exists=$(cat config/enterprise-archive/spaces.yml | grep "${CUSTOMER}-${TIER}" >>/dev/null 2>&1;echo $?)
+  echo -e ${GREEN}"Customer exists? ${customer_exists}"${WHITE}
 
-  if [ "$poplite_exists" -eq 0 ];
+  if [ "customer_exists" -eq 0 ];
   then
-    line=$(grep -n "poplite" config/enterprise-archive/spaces.yml | cut -d: -f1)
+    line=$(grep -n "${CUSTOMER}-${TIER}" config/enterprise-archive/spaces.yml | cut -d: -f1)
     echo -e ${GREEN}"Revert spaces file"${WHITE}
     sed -i "${line},${line}d" config/enterprise-archive/spaces.yml
 
     git add .
-    git commit -m ":sparkler:	PoPlite - Reverted all PCF Spaces"
+    git commit -m ":sparkler:	${CUSTOMER}-${TIER} - Reverted all PCF Spaces"
     git push
   fi
 
@@ -179,17 +196,16 @@ try
 #       git push
 #     fi
 
-  if [ -d "config/enterprise-archive/poplite-production" ]
+  if [ -d "config/enterprise-archive/${CUSTOMER}-${TIER}" ]
   then
     echo -e ${GREEN}"Revert enterprise archive files"${WHITE}
-    git rm config/enterprise-archive/poplite-production -r
+    git rm config/enterprise-archive/${CUSTOMER}-${TIER} -r
     git add .
-    git commit -m ":sparkler:	PoPlite - Reverted enterprise archive files"
+    git commit -m ":sparkler:	${CUSTOMER}-${TIER} - Reverted enterprise archive files"
     git push
   fi
 
   popd
-  rm -rf paas-cf-mgmt-aws-non-prod
   echo -e ${GREEN}"Finished reverting paas-cf-mgmt-aws-non-prod"${WHITE}
 )
 catch || {
@@ -207,17 +223,17 @@ try
   git config user.name "Concourse CI Bot"
   git config user.email "ci@localhost"
 
-  echo -e ${GREEN}"Remove poplite files"${WHITE}
-  find . -name '*poplite*' -exec git rm {} \;
+  echo -e ${GREEN}"Remove ${CUSTOMER}-${TIER} files"${WHITE}
+  find . -name '*${CUSTOMER}-${TIER}*' -exec git rm {} \;
 
-  echo -e ${GREEN}"Find poplite line"${WHITE}
-  line_exists=$(grep -n "poplite" datadog/terraform-code/lag_drain_rate_dashboard_variable.tf >>/dev/null 2>&1;echo $?)
+  echo -e ${GREEN}"Find ${CUSTOMER}-${TIER} line"${WHITE}
+  line_exists=$(grep -n "${CUSTOMER}-${TIER}" datadog/terraform-code/lag_drain_rate_dashboard_variable.tf >>/dev/null 2>&1;echo $?)
   echo -e ${GREEN}"Line exists: $line_exists"${WHITE}
   if [ "$line_exists" -eq 0 ];
   then
     echo -e ${GREEN}"Getting line"${WHITE}
-    line=$(grep -n "poplite" datadog/terraform-code/lag_drain_rate_dashboard_variable.tf | cut -d: -f1 >>/dev/null 2>&1;echo $?)
-    echo -e ${GREEN}"Delete poplite line"${WHITE}
+    line=$(grep -n "${CUSTOMER}-${TIER}" datadog/terraform-code/lag_drain_rate_dashboard_variable.tf | cut -d: -f1 >>/dev/null 2>&1;echo $?)
+    echo -e ${GREEN}"Delete ${CUSTOMER}-${TIER} line"${WHITE}
     sed -i "${line},${line}d" datadog/terraform-code/lag_drain_rate_dashboard_variable.tf
   fi
 
@@ -226,14 +242,13 @@ try
   then
     echo -e ${GREEN}"Commit to GitHub"${WHITE}
     git add .
-    git commit -m ":sparkler:	PoPlite - Revert deployment files"
+    git commit -m ":sparkler:	${CUSTOMER}-${TIER} - Revert deployment files"
     git push
   else
     echo -e ${GREEN}"Nothing to commit"${WHITE}
   fi
 
   popd
-  rm -rf ea-platform-sre-team
   echo -e ${GREEN}"Finished reverting ea-platform-sre-team"${WHITE}
 )
 catch || {
@@ -305,8 +320,6 @@ do
 
   popd
 
-  rm -rf "$repo"
-
   echo -e ${GREEN}"Finished reverting ${repo}"${WHITE}
 
 done
@@ -329,3 +342,39 @@ then
 else
   echo -e ${GREEN}"No errors."${WHITE}
 fi
+
+for i in "${REPOS[@]}"
+do
+  delimiter=","
+  declare -a parts=($(echo -e $i | tr "$delimiter" " "))
+  repo=${parts[0]}
+  branch=${parts[1]}
+
+  cd ${repo}
+  git checkout "${branch}"
+
+  DIRS=( $(find . -type d -name "*${CUSTOMER}-${TIER}*" ) )
+  FILES=( $(find . -type f -name "*${CUSTOMER}-${TIER}*" ) )
+
+for i in "${DIRS[@]}"
+do
+  if [ -d "${i}" ]
+  then
+    echo "This is a directory: ${i}..."
+    rm -r "$i"
+  else
+    echo "This is not a directory: ${i}..."
+  fi
+done
+
+for i in "${FILES[@]}"
+do
+  if [ -f "${i}" ]
+  then
+    echo "This is a file: ${i}"
+    rm "$i"
+  else
+    echo "This file does not exist: ${i}..."
+  fi
+done
+done

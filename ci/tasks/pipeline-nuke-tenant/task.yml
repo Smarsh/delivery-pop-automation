@@ -2,11 +2,18 @@
 platform: linux
 
 inputs:
-  - name: delivery-tenants-api
+  - name: delivery-pop-automation
 
 run:
-  path: delivery-tenants-api/ci/tasks/poplite-nuke-tenant/task.sh
+  path: delivery-pop-automation/ci/tasks/pipeline-nuke-tenant/task.sh
 
 params:
   OKTA_OAUTH2_CLIENT_ID:
   OKTA_OAUTH2_CLIENT_SECRET:
+  CUSTOMER:
+  FLOW_TYPE:
+  TENANT_NAME:
+  REGION:
+  TIER:
+
+
