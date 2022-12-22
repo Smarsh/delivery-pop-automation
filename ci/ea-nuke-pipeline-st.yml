@@ -102,7 +102,7 @@ jobs:
     plan:
       - in_parallel:
         - get: delivery-pop-automation
-          passed: [ set-pipeline ]
+          passed: [ source-pipeline-secrets ]
         - get: delivery-ci-all-image
         - get: delivery-ci-terraform-image
       - in_parallel:
