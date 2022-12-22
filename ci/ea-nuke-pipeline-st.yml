@@ -86,12 +86,10 @@ jobs:
     - task: copy-credhub-secrets
       attempts: 1
       image: delivery-ci-fly-image
-      input_mapping:
-        repo: delivery-aws-pipelines
       config:
         platform: linux
         inputs:
-        - name: repo
+        - name: delivery-pop-automation
         run:
           path: copy_secrets
         params:
