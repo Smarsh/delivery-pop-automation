@@ -4,3 +4,5 @@ tier: production
 region: us-west-2
 service_region: nam
 region_bucket_suffix: uswest2
+concourse_team: platform-delivery-services
+pipeline_name: ea-nuke-pipeline-poplite-production

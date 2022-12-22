@@ -4,3 +4,5 @@ tier: ${TIER}
 region: ${REGION}
 service_region: ${SERVICE_REGION}
 region_bucket_suffix: ${REGION_BUCKET_SUFFIX}
+concourse_team: platform-delivery-services
+pipeline_name: ea-nuke-pipeline-${CUSTOMER}-${TIER}

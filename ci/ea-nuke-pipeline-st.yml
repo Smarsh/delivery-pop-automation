@@ -49,12 +49,15 @@ anchors:
     REGION: ((region))
     SERVICE_REGION: ((service_region))
     TIER: ((tier))
+    TEAM: ((concourse_team))
+    PIPELINE_NAME: ((pipeline_name))
 
 groups:
 
   - name: all
     jobs:
       - set-pipeline
+      - source-pipeline-secrets
       - nuke-all
 
 jobs:
@@ -65,10 +68,36 @@ jobs:
       - in_parallel:
         - get: delivery-pop-automation
           trigger: true
-      - set_pipeline: ea-nuke-pipeline-((customer))-((tier))
+      - set_pipeline: ((pipeline_name))
         file: delivery-pop-automation/ci/ea-nuke-pipeline-st.yml
         var_files:
           - delivery-pop-automation/ci/vars/((cloud))-((region))-((customer))-((tier)).yml
+
+  - name: source-pipeline-secrets
+    serial: true
+    plan:
+    - in_parallel:
+      - get: delivery-pop-automation
+        passed:
+        - set-pipeline
+        trigger: true
+      - get: delivery-ci-fly-image
+      - get: delivery-ci-secrets-image
+    - task: copy-credhub-secrets
+      attempts: 1
+      image: delivery-ci-fly-image
+      input_mapping:
+        repo: delivery-aws-pipelines
+      config:
+        platform: linux
+        inputs:
+        - name: repo
+        run:
+          path: copy_secrets
+        params:
+          <<: *credhub_connection_details
+          <<: *deployment_identifier
+          SECRETS_PATH: ci/vars/secrets.yml
 
   - name: nuke-all
     serial: true
@@ -187,6 +216,16 @@ resources:
     type: registry-image
     source:
       repository: smarshops/delivery-ci-terraform
+
+  - name: delivery-ci-fly-image
+    type: registry-image
+    source:
+      repository: smarshops/delivery-ci-fly
+
+  - name: delivery-ci-secrets-image
+    type: registry-image
+    source:
+      repository: smarshops/delivery-ci-secrets
 
 resource_types:
 
