@@ -5,6 +5,8 @@ set -euo pipefail
 : "${TIER:?TIER env var must be provided}"
 : "${AWS_ACCESS_KEY_ID:?AWS_ACCESS_KEY_ID env var must be provided}"
 : "${AWS_SECRET_ACCESS_KEY:?AWS_SECRET_ACCESS_KEY env var must be provided}"
+: "${REGION:?REGION env var must be provided}"
+
 
 # Set colours
 GREEN="\e[32m"
@@ -22,7 +24,7 @@ cd ../
 
 cd terraform_workspace
 terraform init -reconfigure
-aws rds modify-db-instance --db-instance-identifier eadb-uaa-postgres-${CUSTOMER}-${TIER} --region ${CLOUD_REGION} --no-deletion-protection --apply-immediately > output.txt
+aws rds modify-db-instance --db-instance-identifier eadb-uaa-postgres-${CUSTOMER}-${TIER} --region ${REGION} --no-deletion-protection --apply-immediately > output.txt
 terraform plan -destroy
 # terraform apply -destroy -auto-approve
 cd ../
@@ -35,7 +37,7 @@ cd ../
 
 cd terraform_workspace
 terraform init -reconfigure
-aws rds modify-db-instance --db-instance-identifier eadb-egw-tps-postgres-tpspostgres-${CUSTOMER}-${TIER} --region ${CLOUD_REGION} --no-deletion-protection --apply-immediately > output.txt
+aws rds modify-db-instance --db-instance-identifier eadb-egw-tps-postgres-tpspostgres-${CUSTOMER}-${TIER} --region ${REGION} --no-deletion-protection --apply-immediately > output.txt
 terraform plan -destroy
 # terraform apply -destroy -auto-approve
 cd ../

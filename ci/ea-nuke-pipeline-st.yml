@@ -51,6 +51,7 @@ anchors:
     TIER: ((tier))
     TEAM: ((concourse_team))
     PIPELINE_NAME: ((pipeline_name))
+    REGION_BUCKET_SUFFIX: ((region_bucket_suffix))
 
 groups:
 
@@ -142,10 +143,7 @@ jobs:
           file: delivery-pop-automation/ci/tasks/pipeline-nuke-aws-services/task.yml
           image: delivery-ci-terraform-image
           params:
-            CUSTOMER: ((customer))
-            REGION: ((region))
-            TIER: ((tier))
-            REGION_BUCKET_SUFFIX: ((region_bucket_suffix))
+            <<: *deployment_identifier
             AWS_ACCESS_KEY_ID: ((ea_iam_access_key_id))
             AWS_SECRET_ACCESS_KEY: ((ea_iam_secret_access_key))
         - task: nuke-credhub-secrets
