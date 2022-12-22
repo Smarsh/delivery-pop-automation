@@ -78,6 +78,7 @@ jobs:
     plan:
     - in_parallel:
       - get: delivery-pop-automation
+        trigger: true
         passed:
         - set-pipeline
         trigger: true
