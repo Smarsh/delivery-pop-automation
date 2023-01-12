@@ -1,7 +1,7 @@
 terraform {
     backend "s3" {
       bucket   = "smarsh-terraform-state-management-${REGION_BUCKET_SUFFIX}"
-      key      = "{KEY_PATH}"
+      key      = "${KEY_PATH}"
       region   = "${REGION}"
     }
 

@@ -49,12 +49,16 @@ anchors:
     REGION: ((region))
     SERVICE_REGION: ((service_region))
     TIER: ((tier))
+    TEAM: ((concourse_team))
+    PIPELINE_NAME: ((pipeline_name))
+    REGION_BUCKET_SUFFIX: ((region_bucket_suffix))
 
 groups:
 
   - name: all
     jobs:
       - set-pipeline
+      - source-pipeline-secrets
       - nuke-all
 
 jobs:
@@ -65,17 +69,44 @@ jobs:
       - in_parallel:
         - get: delivery-pop-automation
           trigger: true
-      - set_pipeline: ea-nuke-pipeline-((customer))-((tier))
+      - set_pipeline: ((pipeline_name))
         file: delivery-pop-automation/ci/ea-nuke-pipeline-st.yml
         var_files:
           - delivery-pop-automation/ci/vars/((cloud))-((region))-((customer))-((tier)).yml
+
+  - name: source-pipeline-secrets
+    serial: true
+    plan:
+    - in_parallel:
+      - get: delivery-pop-automation
+        trigger: true
+        passed:
+        - set-pipeline
+        trigger: true
+      - get: delivery-ci-fly-image
+      - get: delivery-ci-secrets-image
+    - task: copy-credhub-secrets
+      attempts: 1
+      image: delivery-ci-fly-image
+      input_mapping:
+        repo: delivery-pop-automation
+      config:
+        platform: linux
+        inputs:
+        - name: repo
+        run:
+          path: copy_secrets
+        params:
+          <<: *credhub_connection_details
+          <<: *deployment_identifier
+          SECRETS_PATH: ci/vars/secrets.yml
 
   - name: nuke-all
     serial: true
     plan:
       - in_parallel:
         - get: delivery-pop-automation
-          passed: [ set-pipeline ]
+          passed: [ source-pipeline-secrets ]
         - get: delivery-ci-all-image
         - get: delivery-aws-pipelines
         - get: delivery-ci-terraform-image
@@ -113,10 +144,7 @@ jobs:
           file: delivery-pop-automation/ci/tasks/pipeline-nuke-aws-services/task.yml
           image: delivery-ci-terraform-image
           params:
-            CUSTOMER: ((customer))
-            REGION: ((region))
-            TIER: ((tier))
-            REGION_BUCKET_SUFFIX: ((region_bucket_suffix))
+            <<: *deployment_identifier
             AWS_ACCESS_KEY_ID: ((ea_iam_access_key_id))
             AWS_SECRET_ACCESS_KEY: ((ea_iam_secret_access_key))
         - task: nuke-aws-s3-buckets
@@ -172,13 +200,6 @@ jobs:
       #     <<: *deployment_identifier
       #     FLOW_TYPE: mt_st_first
       #     TENANT_NAME: msanity
-      - task: nuke-fleet-pipeline
-        attempts: 1
-        file: delivery-pop-automation/ci/tasks/nuke-fleet-pipeline/task.yml
-        image: delivery-ci-all-image
-        params:
-          <<: *concourse_connection_details
-          <<: *deployment_identifier
 
     <<: *slack-alerts
 
@@ -215,10 +236,22 @@ resources:
     source:
       repository: smarshops/delivery-ci-terraform
 
+
   - name: delivery-ci-boto3-image
     type: registry-image
     source:
       repository: smarshops/delivery-ci-boto3
+      
+  - name: delivery-ci-fly-image
+    type: registry-image
+    source:
+      repository: smarshops/delivery-ci-fly
+
+  - name: delivery-ci-secrets-image
+    type: registry-image
+    source:
+      repository: smarshops/delivery-ci-secrets
+
 
 resource_types:
 
