@@ -14,8 +14,7 @@ object_store_prefix=os.getenv('object_store_prefix')
 # Getting all tenants from env_space_name_tenant_provisioning.yml
 def get_tenant_list(filename):   
     tenants = []
-    tenants.append(lst["tenant_name"])
-    os.chdir("./")
+    os.chdir(r"delivery-aws-pipelines/ci/vars")
     with open(filename, "r") as f:
         yamldoc = yaml.safe_load(f)
         for tenant in yamldoc["customer_tenants"]:
@@ -25,7 +24,7 @@ def get_tenant_list(filename):
 # Generating Bucket name by adding object_store_prefix + tenant_name
 def get_buckets_to_delete(tenants):
         buckets_to_delete=[]
-        for tenant in tenant:
+        for tenant in tenants:
                 buckets_to_delete.append(object_store_prefix+tenant)
         return buckets_to_delete
 
