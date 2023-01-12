@@ -108,6 +108,7 @@ jobs:
         - get: delivery-pop-automation
           passed: [ source-pipeline-secrets ]
         - get: delivery-ci-all-image
+        - get: delivery-aws-pipelines
         - get: delivery-ci-terraform-image
       - in_parallel:
         - task: nuke-pipelines
@@ -146,6 +147,16 @@ jobs:
             <<: *deployment_identifier
             AWS_ACCESS_KEY_ID: ((ea_iam_access_key_id))
             AWS_SECRET_ACCESS_KEY: ((ea_iam_secret_access_key))
+        - task: nuke-aws-s3-buckets
+          attempts: 1
+          file: delivery-pop-automation/ci/tasks/nuke-s3-bucket/task.yml
+          image: delivery-ci-boto3-image
+          params:
+            region: ((region))
+            env_space_name: ((env_space_name))
+            object_store_prefix: ((object_store_prefix))
+            aws_access_key_id: ((ea_iam_access_key_id))
+            aws_secret_access_key: ((ea_iam_secret_access_key))
         - task: nuke-credhub-secrets
           attempts: 1
           file: delivery-pop-automation/ci/tasks/pipeline-nuke-credhub-secrets/task.yml
@@ -201,6 +212,15 @@ resources:
       uri: git@github.com:Smarsh/delivery-pop-automation.git
       branch: master
 
+- name: delivery-aws-pipelines
+    type: git
+    source:
+      private_key: ((github_private_key))
+      uri: git@github.com:Smarsh/delivery-aws-pipelines
+      branch: master
+      paths:
+      - ci/vars/((env_space_name))_tenant_provisioning.yml
+
   - name: slack-alert
     type: slack-notification
     source:
@@ -216,6 +236,12 @@ resources:
     source:
       repository: smarshops/delivery-ci-terraform
 
+
+  - name: delivery-ci-boto3-image
+    type: registry-image
+    source:
+      repository: smarshops/delivery-ci-boto3
+      
   - name: delivery-ci-fly-image
     type: registry-image
     source:
@@ -225,6 +251,7 @@ resources:
     type: registry-image
     source:
       repository: smarshops/delivery-ci-secrets
+
 
 resource_types:
 

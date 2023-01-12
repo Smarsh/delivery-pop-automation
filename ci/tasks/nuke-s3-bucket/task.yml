@@ -1,0 +1,17 @@
+---
+platform: linux
+
+inputs:
+- name: delivery-aws-pipelines
+- name: delivery-pop-automation
+
+run:
+  path: /bin/bash
+  args: ["delivery-pop-automation/ci/tasks/nuke-s3-bucket/task.py"]
+
+params:
+  aws_secret_access_key:
+  aws_access_key_id:
+  object_store_prefix:
+  env_space_name:
+  region:
